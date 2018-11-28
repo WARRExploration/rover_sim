@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rover_sim</name>
+  <version>0.0.0</version>
+  <description>Contains all the simulation requirement files for the simulation of the WARR Exploration Rover.</description>
+
+  <maintainer email="exploration@warr.de">WARR Exploration</maintainer>
+
+
+  <license>GPLv3</license>
+
+  <url type="website">http://exploration.warr.de</url>
+
+  <author email="markus.goegele@warr.de">Markus Gögele</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
