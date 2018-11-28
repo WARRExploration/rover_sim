@@ -2,7 +2,7 @@
 <package format="2">
   <name>rover_sim</name>
   <version>0.0.0</version>
-  <description>Contains all the simulation requirement files for the simulation of the WARR Exploration Rover.</description>
+  <description>Contains all the requirement files for the simulation of the WARR Exploration Rover.</description>
 
   <maintainer email="exploration@warr.de">WARR Exploration</maintainer>
 
