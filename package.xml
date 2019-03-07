@@ -14,6 +14,8 @@
   <author email="markus.goegele@warr.de">Markus Gögele</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>roboticsgroup_gazebo_plugins</depend>
+
   <exec_depend>urdf_tutorial</exec_depend>
 
   <exec_depend>rover_config</exec_depend>
