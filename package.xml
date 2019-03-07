@@ -14,5 +14,12 @@
   <author email="markus.goegele@warr.de">Markus Gögele</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>urdf_tutorial</exec_depend>
+
+  <exec_depend>rover_config</exec_depend>
+  <exec_depend>rover_control</exec_depend>
+
+  <exec_depend>joy</exec_depend>
+  <exec_depend>teleop_twist_joy</exec_depend>
 
 </package>
