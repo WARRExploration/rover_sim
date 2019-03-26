@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from collada import *
 mesh = Collada()
 
