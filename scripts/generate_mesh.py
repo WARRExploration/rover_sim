@@ -12,6 +12,10 @@ data = np.loadtxt(open(path, "rb"), delimiter=",", skiprows=2)
 data = np.moveaxis(np.flip(data, 0), 0, -1)
 cols, rows = data.shape
 
+# small helper function
+def id(x, y):
+    return x * rows + y
+
 # read further information
 with open(path) as fp:
    for i, line in enumerate(fp):
@@ -32,7 +36,7 @@ coords = np.stack((xs, ys, data), axis=2)
 
 # add a material
 mesh = Collada()
-effect = material.Effect("effect0", [], "phong", diffuse=(1,0,0), specular=(0,1,0))
+effect = material.Effect("effect0", [], "phong", emission=(0.2,0,0,1.0), diffuse=(0,1.0,0,1.0), specular=(1.0,1.0,1.0,1.0))
 mat = material.Material("material0", "mymaterial", effect)
 mesh.effects.append(effect)
 mesh.materials.append(mat)
@@ -47,7 +51,17 @@ normal_floats = [0,0,1,0,0,1,0,0,1,0,0,1,0,1,0,
     0,0,-1,0,0,-1,0,0,-1]
 '''
 vert_floats = coords.flatten()
-normal_floats = np.stack((np.array([0,0,1]),)*cols*rows, axis=0).flatten()
+
+normal_floats = []
+for x in range(cols):
+    for y in range(rows):
+        if x == 0 or x == cols-1 or y == 0 or y == rows-1:
+            normal_floats.append([0,0,1])
+            continue
+        tmp = np.cross(coords[x+1,y]-coords[x-1,y],coords[x,y+1]-coords[x,y-1])
+        tmp = tmp / np.linalg.norm(tmp)
+        normal_floats.append(tmp)
+
 vert_src = source.FloatSource("cubeverts-array", np.array(vert_floats), ('X', 'Y', 'Z'))
 normal_src = source.FloatSource("cubenormals-array", np.array(normal_floats), ('X', 'Y', 'Z'))
 
@@ -66,10 +80,6 @@ indices = numpy.array([0,0,2,1,3,2,0,0,3,2,1,3,0,4,1,5,5,6,0,
     4,13,6,14,0,12,6,14,2,15,3,16,7,17,5,18,3,
     16,5,18,1,19,5,20,7,21,6,22,5,20,6,22,4,23])
 '''
-
-def id(x, y):
-    return x * rows + y
-
 indices = []
 for x in range(cols-1):
     for y in range(rows-1):
