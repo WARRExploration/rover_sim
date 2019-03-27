@@ -26,5 +26,26 @@
             </link>
             <pose>-27 -14.5 -2 0 0 0</pose>
         </model>
+        
+         <model name="marker5">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                    <mesh>
+                        <uri>model://rover_sim/models/markers/marker_coll.dae</uri>
+                    </mesh>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                    <mesh>
+                        <uri>model://rover_sim/models/markers/models/marker7000.dae</uri>
+                    </mesh>     
+                    </geometry>
+                </visual>
+            </link>
+            <pose>-27 -14.5 -2 0 0 0</pose>
+        </model>
     </world>
 </sdf>
