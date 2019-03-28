@@ -5,14 +5,14 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0</authoring_tool>
     </contributor>
-    <created>2019-03-27T21:08:09</created>
-    <modified>2019-03-27T21:08:09</modified>
+    <created>2019-03-28T20:14:18</created>
+    <modified>2019-03-28T20:14:18</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
   <library_images>
     <image id="texture_marker_png" name="texture_marker_png">
-      <init_from>texture_marker.png</init_from>
+      <init_from>../textures/texture_marker6.png</init_from>
     </image>
   </library_images>
   <library_effects>
@@ -31,7 +31,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0.52 0.52 0.52 1</color>
+              <color sid="emission">0.31 0.31 0.31 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0 0 0 1</color>
@@ -83,7 +83,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0 0 0 1</color>
+              <color sid="emission">0.52 0.52 0.52 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0 0 0 1</color>
@@ -140,7 +140,7 @@
           </technique_common>
         </source>
         <source id="Cube_001-mesh-map-0">
-          <float_array id="Cube_001-mesh-map-0-array" count="72">0 1 1 0 0 0 0 1 1 0 0 0 0 1 -1 0 0 0 0 1 -1 0 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 1 1 1 0 0 1 1 1 1 0 0 1 -1 1 -1 0 0 1 -1 1 -1 0 1 0 1 -1 0 -1 -1 0 -1 -1 0 -1</float_array>
+          <float_array id="Cube_001-mesh-map-0-array" count="72">1 1 0 0 1 0 1 1 0 0 1 0 0 1 -1 0 0 0 0 1 -1 0 0 0 1 0 0 -1 0 0 0 1 1 0 1 1 1 1 0 1 0 0 1 1 0 1 0 0 0 1 -1 1 -1 0 0 1 -1 1 -1 0 1 0 1 -1 0 -1 0 1 0 0 1 0</float_array>
           <technique_common>
             <accessor source="#Cube_001-mesh-map-0-array" count="36" stride="2">
               <param name="S" type="float"/>
