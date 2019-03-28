@@ -61,5 +61,6 @@ def create_model(i):
     return;
 
 
-create_texture(7000)
-create_model(7000)
+for i in range(1, 13):
+    create_texture(i)
+    create_model(i)

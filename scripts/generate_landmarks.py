@@ -63,12 +63,20 @@ finally:
             collision.set("name", "collision")
 
             geometry = etree.Element("geometry")
-            box = etree.Element("box")
-            size = etree.Element("size")
-            size.text = str(box_size) + " " + str(box_size) + " " + str(box_size)
 
-            box.append(size)
-            geometry.append(box)
+            mesh = etree.Element("mesh")
+            uri = etree.Element("uri")
+            uri.text = "model://rover_sim/models/markers/models/marker" + row[0][1:] + ".dae"
+
+            # box = etree.Element("box")
+            # size = etree.Element("size")
+            # size.text = str(box_size) + " " + str(box_size) + " " + str(box_size)
+
+            # box.append(size)
+            # geometry.append(box)
+            
+            mesh.append(uri)
+            geometry.append(mesh)
         
             visual.append(geometry)
             collision.append(copy.deepcopy(geometry))
