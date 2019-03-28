@@ -1,0 +1,67 @@
+"""
+This script generates terrain in the ERC provided format and writes it down into a csv file
+
+Todo:
+Replace hardcode of file paths and variables with an apropriate command line arguements
+
+"""
+
+
+from PIL import Image
+import numpy as np
+import os 
+import random
+import csv
+from sys import maxsize
+from noise import pnoise2
+
+map_height = 110
+map_width = 60
+rows_spacing = 0.5
+columns_spacing = 0.5
+noise_base = random.randint(0,100000)
+
+max_altitude = 2
+min_altitude = -0.5
+data = np.empty ([map_width, map_height])
+
+iterator = np.nditer(data, flags=["multi_index"], op_flags=['writeonly'])
+
+# Calculating noise
+while not iterator.finished:
+    iterator[0] = round(pnoise2 (iterator.multi_index[0]/ map_width, iterator.multi_index[1]/map_height, octaves = 4, base = noise_base), 5)
+    iterator.iternext()
+
+#Normalizing noise within range
+data = min_altitude + (max_altitude - min_altitude) * (data - np.min(data))/(np.max(data) - np.min(data)) 
+
+
+dirname = os.path.dirname(__file__)
+path = os.path.join(dirname, "../generated_maps/map.csv")
+
+with open(path, 'w+', newline='') as f:
+    writer = csv.writer(f, delimiter="|" , quoting = csv.QUOTE_NONE)
+    writer.writerow (["Number of Rows ",  " Number of Columns ", " Grid spacing rows ", " Grid spacing columns ", " Coordinates of the first point in the matrix (x,y)"])   
+    writer = csv.writer(f, delimiter=" " , quoting = csv.QUOTE_NONE)
+    writer.writerow ([str(map_height), str(map_width), str(rows_spacing), str(columns_spacing), str(0), str(map_height//2)])
+    
+    s1 = "Number of Rows | Number of Columns | Grid spacing rows | Grid spacing columns | Coordinates of the first point in the matrix (x,y)"
+    s2 = str(map_height) + str(map_width) + str(rows_spacing) + str(columns_spacing) + str(0) + str(map_height//2)
+
+    np.savetxt(f, data, fmt="%.5f", delimiter=",")
+
+
+# Uncomment this if you want to get nice pictures as the output
+"""
+w, h = data.shape
+data -= np.min(data)
+data /= np.max(data)
+data *= 255
+data = np.stack((data,)*3, axis=-1)
+
+img = Image.fromarray(np.uint8(data), 'RGB')
+
+path = "../worlds/gterrain.png"
+img.save(path)
+img.show()
+"""
