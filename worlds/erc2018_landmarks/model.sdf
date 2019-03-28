@@ -4,19 +4,19 @@
     <model name="L1">
       <include>
         <uri>model://rover_sim/models/landmarks/L1</uri>
-        <pose>12.70 7.70 0.80 0 0 0</pose>
+        <pose>12.70 7.70 1.80 0 0 0</pose>
       </include>
     </model>
     <model name="L2">
       <include>
         <uri>model://rover_sim/models/landmarks/L2</uri>
-        <pose>30.70 15.00 0.60 0 0 0</pose>
+        <pose>30.70 15.00 1.60 0 0 0</pose>
       </include>
     </model>
     <model name="L3">
       <include>
         <uri>model://rover_sim/models/landmarks/L3</uri>
-        <pose>20.90 12.40 0.70 0 0 0</pose>
+        <pose>20.90 12.40 1.70 0 0 0</pose>
       </include>
     </model>
     <model name="L4">
@@ -70,7 +70,7 @@
     <model name="L12">
       <include>
         <uri>model://rover_sim/models/landmarks/L12</uri>
-        <pose>13.10 19.00 0.60 0 0 0</pose>
+        <pose>13.10 19.00 1.60 0 0 0</pose>
       </include>
     </model>
   </model>
