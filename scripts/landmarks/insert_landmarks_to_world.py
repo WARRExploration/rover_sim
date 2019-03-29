@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 This script takes locations of the landmarks on the field from a csv file and ads appropriate locations to some gazebo world  
 (or creates a world with only landmarks, if a world does not exist)

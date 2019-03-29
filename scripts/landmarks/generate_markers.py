@@ -4,22 +4,25 @@ from shutil import copy2
 import os
 import copy
 
+scale_factor = [0.21, 0.21, 0.297]
+
+
 def create_texture(i, path):
     tag_number = i
 
-    number_y = 20
-    number_size = 100
+    number_y = -5
+    number_size = 75
 
-    box_y = number_y + number_size + 20
-    box_size = (400, 100)
+    box_y = number_y + number_size + 5
+    box_size = (190, 50)
     circle_number = 4
-    circle_size = 70
-    circle_dist = 100
+    circle_size = 35
+    circle_dist = box_size[0] / 4
 
-    ar_y = box_y + box_size[1] + 20
-    ar_size = 340
+    ar_y = box_y + box_size[1] + 10
+    ar_size = 150
 
-    size = (430, ar_y + ar_size + 20)
+    size = (210, 297)
 
 
     img = Image.new('RGBA', size, (255,255,255,255))
@@ -125,7 +128,11 @@ def create_model_sdf(i, pose_s, path_visual, path_collision, path):
     uri = etree.Element('uri')
     uri.text = path_visual
     
+    scale = etree.Element('scale')
+    scale.text = ' '.join(list(map(str, scale_factor)))
+
     mesh.append(uri)
+    mesh.append(scale)
     geometry.append(mesh)
     visual.append(geometry)
 
@@ -138,7 +145,11 @@ def create_model_sdf(i, pose_s, path_visual, path_collision, path):
     uri = etree.Element('uri')
     uri.text = path_collision
     
+    scale = etree.Element('scale')
+    scale.text = ' '.join(list(map(str, scale_factor)))
+
     mesh.append(uri)
+    mesh.append(scale)
     geometry.append(mesh)
     collision.append(geometry)
 
