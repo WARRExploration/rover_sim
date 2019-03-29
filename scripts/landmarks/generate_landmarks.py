@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 """
-This script takes locations of the landmarks on the field from a csv file and ads appropriate locations to some gazebo world  
-(or creates a world with only landmarks, if a world does not exist)
-
-Todo:
-Replace simple boxes with textured collada models
-
+This script takes locations of the landmarks on the field from a csv file and adds textured models at the appropriate locations
+to some gazebo sdf model to be <include>ed in a world file
 """
 from lxml import etree
 import csv
@@ -13,12 +9,12 @@ import copy
 from argparse import ArgumentParser
 from shutil import copyfile
 
-import generate_markers
+import generate_single_landmark
 
 parser = ArgumentParser(description = "Adds landmarks to worlds")
 parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file", nargs="?",
         default="../../providedFiles/erc2018/Landmarks.csv")
-parser.add_argument("-o", "--output", type=str, help = "Path to .sdf file to add landmarks", nargs="?",
+parser.add_argument("-o", "--output", type=str, help = "Path to .sdf file where the landmarks are inserted", nargs="?",
         default="../../worlds/erc2018_landmarks/model.sdf")
 
 args = parser.parse_args()
@@ -41,7 +37,7 @@ with open (args.landmarks) as csvfile:
         i = row[0][1:]
 
         # (we define the pose in the <include>)
-        generate_markers.create_all(int(i), '0 0 0 0 0 0')
+        generate_single_landmark.create_all(int(i), '0 0 0 0 0 0')
 
         model = etree.Element('model')
         model.set('name', 'L' + i)

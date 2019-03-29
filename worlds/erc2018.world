@@ -35,5 +35,11 @@
             <uri>model://rover_sim/worlds/erc2018_landmarks</uri>
         </include>
         
+        
+        <include>
+            <uri>model://rover_sim/models/names/Logo</uri>
+        </include>
+        
+        
     </world>
 </sdf>

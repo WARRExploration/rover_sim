@@ -1,17 +1,24 @@
+"""
+This script provides a function to create a single Gazebo-importable landmark model in the 'rover_sim/models/landmarks' directory
+To create a landmark with a specific number call 'create_all' with the number
+"""
 from PIL import Image, ImageDraw, ImageFont
 from lxml import etree
 from shutil import copy2
 import os
 import copy
 
+"""
+Size x,y,z of each marker. 0.21 corresponds to 21 cm if the .dae model has side length 1
+"""
 scale_factor = [0.21, 0.21, 0.297]
 
 
 def create_texture(i, path):
     tag_number = i
 
-    number_y = -5
-    number_size = 75
+    number_y = 0
+    number_size = 65
 
     box_y = number_y + number_size + 5
     box_size = (190, 50)
@@ -28,7 +35,7 @@ def create_texture(i, path):
     img = Image.new('RGBA', size, (255,255,255,255))
 
     # get a font
-    fnt = ImageFont.truetype('DejaVuSans-Bold.ttf', number_size)
+    fnt = ImageFont.truetype('Roboto-Bold.ttf', number_size)
     # get a drawing context
     d = ImageDraw.Draw(img)
 
@@ -45,11 +52,12 @@ def create_texture(i, path):
 
 
     # ar tag
-    os.system('cd textures; rosrun ar_track_alvar createMarker ' + str(tag_number))
+    os.system('mkdir tmp_textures')
+    os.system('cd tmp_textures; rosrun ar_track_alvar createMarker ' + str(tag_number))
 
-    ar_tag = Image.open('textures/MarkerData_' + str(tag_number) + '.png').resize((ar_size,ar_size), Image.NEAREST)
+    ar_tag = Image.open('tmp_textures/MarkerData_' + str(tag_number) + '.png').resize((ar_size,ar_size), Image.NEAREST)
     img.paste(ar_tag, ((size[0]-ar_size)/2, ar_y))
-
+    os.system('rm -r tmp_textures')
 
     #img.show() 
     img.save(path)
@@ -200,4 +208,4 @@ def create_all(i, pose):
  #   create_texture(i)
   #  create_model(i)
 
-create_all(8, '0 0 0 0 0 0')
+#create_all(8, '0 0 0 0 0 0')
