@@ -12,7 +12,7 @@
   </asset>
   <library_images>
     <image id="texture_marker_png" name="texture_marker_png">
-      <init_from>../textures/texture_marker10.png</init_from>
+      <init_from>texture_marker.png</init_from>
     </image>
   </library_images>
   <library_effects>

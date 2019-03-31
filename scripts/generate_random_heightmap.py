@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 This script generates terrain in the ERC provided format and writes it down into a csv file
 
@@ -19,7 +20,7 @@ map_height = 110
 map_width = 60
 rows_spacing = 0.5
 columns_spacing = 0.5
-noise_base = random.randint(0,100000)
+noise_base = random.randint(0,100)
 
 max_altitude = 2
 min_altitude = -0.5
