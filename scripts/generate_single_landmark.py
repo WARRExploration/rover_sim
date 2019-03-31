@@ -35,7 +35,7 @@ def create_texture(i, path):
     img = Image.new('RGBA', size, (255,255,255,255))
 
     # get a font
-    fnt = ImageFont.truetype('Roboto-Bold.ttf', number_size)
+    fnt = ImageFont.truetype('../resources/landmarks/Roboto-Bold.ttf', number_size)
     # get a drawing context
     d = ImageDraw.Draw(img)
 
@@ -66,7 +66,7 @@ def create_texture(i, path):
 
 
 def create_mesh(i, path):
-    with open('marker.dae') as f:
+    with open('../resources/landmarks/marker.dae') as f:
         newText=f.read().replace('<init_from>texture_marker.png</init_from>',
                                 '<init_from>../textures/texture_marker' + str(i) + '.png</init_from>')
 
@@ -77,7 +77,7 @@ def create_mesh(i, path):
 
 
 def create_mesh_coll(i, path):
-    with open('marker_coll.dae') as f:
+    with open('../resources/landmarks/marker_coll.dae') as f:
         newText=f.read().replace('<init_from>texture_marker.png</init_from>',
                                 '<init_from>../textures/texture_marker' + str(i) + '.png</init_from>')
 
@@ -186,21 +186,21 @@ def create_model_sdf(i, pose_s, path_visual, path_collision, path):
 def create_all(i, pose):
     # in 'roversim/src/scripts/landmarks''
 
-    os.system('mkdir -p ' + '../../models/landmarks/L' + str(i) + '/textures'
-                    + ' ' + '../../models/landmarks/L' + str(i) + '/meshes')
+    os.system('mkdir -p ' + '../models/landmarks/L' + str(i) + '/textures'
+                    + ' ' + '../models/landmarks/L' + str(i) + '/meshes')
 
-    create_texture(i,       '../../models/landmarks/L' + str(i) + '/textures/texture_marker' + str(i) + '.png')
+    create_texture(i,       '../models/landmarks/L' + str(i) + '/textures/texture_marker' + str(i) + '.png')
     
-    create_mesh(i,          '../../models/landmarks/L' + str(i) + '/meshes/marker' + str(i) + '.dae')
+    create_mesh(i,          '../models/landmarks/L' + str(i) + '/meshes/marker' + str(i) + '.dae')
 
-    create_mesh_coll(i,     '../../models/landmarks/L' + str(i) + '/meshes/marker_coll.dae')
+    create_mesh_coll(i,     '../models/landmarks/L' + str(i) + '/meshes/marker_coll.dae')
 
-    create_model_config(i,  '../../models/landmarks/L' + str(i) + '/model.config')
+    create_model_config(i,  '../models/landmarks/L' + str(i) + '/model.config')
 
     create_model_sdf(i, pose,
         path_visual=    'model://rover_sim/models/landmarks/L' + str(i) + '/meshes/marker' + str(i) + '.dae',
         path_collision= 'model://rover_sim/models/landmarks/L' + str(i) + '/meshes/marker_coll.dae',
-        path=           '../../models/landmarks/L' + str(i) + '/model.sdf')
+        path=           '../models/landmarks/L' + str(i) + '/model.sdf')
 
 
 

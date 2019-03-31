@@ -13,9 +13,9 @@ import generate_single_landmark
 
 parser = ArgumentParser(description = "Adds landmarks to worlds")
 parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file", nargs="?",
-        default="../../providedFiles/erc2018/Landmarks.csv")
+        default="../providedFiles/erc2018/Landmarks.csv")
 parser.add_argument("-o", "--output", type=str, help = "Path to .sdf file where the landmarks are inserted", nargs="?",
-        default="../../worlds/erc2018_landmarks/model.sdf")
+        default="../worlds/erc2018_landmarks/model.sdf")
 
 args = parser.parse_args()
 

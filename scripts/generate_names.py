@@ -13,7 +13,7 @@ def create_name_texture(name, path):
     img = Image.new('RGBA', size, (255,255,255,255))
 
     # get a font
-    fnt = ImageFont.truetype('DejaVuSans-Bold.ttf', font_size)
+    fnt = ImageFont.truetype('../resources/names/DejaVuSans-Bold.ttf', font_size)
     # get a drawing context
     d = ImageDraw.Draw(img)
 
@@ -123,25 +123,28 @@ def create_model_sdf(name, pose_s, path, path_visual):
 def create_all(name, pose):
     # in 'roversim/src/scripts/names''
 
-    os.system('mkdir -p ' + '../../models/names/' + name + '/textures'
-                    + ' ' + '../../models/names/' + name + '/meshes')
+    os.system('mkdir -p ' + '../models/names/' + name + '/textures'
+                    + ' ' + '../models/names/' + name + '/meshes')
 
-    create_name_texture(name,       '../../models/names/' + name + '/textures/texture_name.png')
+    create_name_texture(name,       '../models/names/' + name + '/textures/texture_name.png')
     
-    create_mesh('name_default.dae', '../../models/names/' + name + '/meshes/mesh_name.dae')
+    create_mesh('../resources/names/name_default.dae', 
+                                    '../models/names/' + name + '/meshes/mesh_name.dae')
 
-    create_model_config(name,       '../../models/names/' + name + '/model.config')
+    create_model_config(name,       '../models/names/' + name + '/model.config')
 
     create_model_sdf(name, pose,
-        path=                       '../../models/names/' + name + '/model.sdf',
+        path=                       '../models/names/' + name + '/model.sdf',
         path_visual=    'model://rover_sim/models/names/' + name + '/meshes/mesh_name.dae')
 
 
 
 def create_logo(name, pose):
     create_all(name, pose)
-    copy2('Exploration_logo.png', '../../models/names/' + name + '/textures/texture_name.png')
-    create_mesh('exp_logo.dae', '../../models/names/' + name + '/meshes/mesh_name.dae')
+    copy2(      '../resources/names/Exploration_logo.png', 
+                '../models/names/' + name + '/textures/texture_name.png')
+    create_mesh('../resources/names/exp_logo.dae', 
+                '../models/names/' + name + '/meshes/mesh_name.dae')
 
 
 
