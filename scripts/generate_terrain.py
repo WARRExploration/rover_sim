@@ -9,7 +9,6 @@ import numpy as np
 import os
 from rospkg import RosPack
 from shutil import copyfile
-from argparse import ArgumentParser
 
 
 def id(x, y, number_of_rows):
@@ -294,30 +293,26 @@ def generate_terrain(csv_file_path, output_folder, terrain_name):
 
 if __name__ == '__main__':
 
-    """generate the the texure and the mesh of a ERC terrain in a specified folder
-
-    Arguments:
-        csv_file_path {str} -- path to the ERC csv file (ver2)
-        output_folder {str} -- path to the folder where the files should be generated, the path will be created
-        terrain_name {str} -- name of the terrain collada file
-    """
+    from argparse import ArgumentParser
 
     rospack = RosPack()
+
+    # get path of package
     rover_sim_dir = rospack.get_path('rover_sim')
+    
+    # default values
     csv_file_path = os.path.join(
         rover_sim_dir, 'providedFiles/erc2018/DTM_ver2.csv')
     output_folder = os.path.join(rover_sim_dir, 'models/terrain')
     terrain_name = 'terrain'
 
+    # parse command line arguments
     parser = ArgumentParser(
         description="generate the the texure and the mesh of a ERC terrain in a specified folder")
-    parser.add_argument("-i", "--input", type=str, help="path to the ERC csv file (ver2)", nargs=1,
-                        default=csv_file_path)
-    parser.add_argument("-o", "--output", type=str, help="path to the folder where the files should be generated, the path will be created", nargs=1,
-                        default=output_folder)
-    parser.add_argument("-n", "--name", type=str, help="name of the terrain collada file", nargs=1,
-                        default=terrain_name)
-
+    parser.add_argument("-i", "--input", type=str, help="path to the ERC csv file (ver2)", default=csv_file_path)
+    parser.add_argument("-o", "--output", type=str, help="path to the folder where the files should be generated, the path will be created", default=output_folder)
+    parser.add_argument("-n", "--name", type=str, help="name of the terrain collada file", default=terrain_name)
     args = parser.parse_args()
 
+    # generate terrain
     generate_terrain(args.input, args.output, args.name)
