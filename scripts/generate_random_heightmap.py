@@ -13,7 +13,16 @@ import os
 import random
 import csv
 from sys import maxsize
-from noise import pnoise2
+from noise import pnoise2 # if error: pip install noise
+from argparse import ArgumentParser
+
+#couldn't test the script because segfault, sry :)
+
+parser = ArgumentParser(description = "Creates random heightmap as .csv")
+parser.add_argument("-o", "--output", type=str, help = "Path to heightmap csv file",
+                    nargs="?", default="../generated_maps/map.csv")
+
+args = parser.parse_args()
 
 map_height = 110
 map_width = 60
@@ -37,7 +46,7 @@ data = min_altitude + (max_altitude - min_altitude) * (data - np.min(data))/(np.
 
 
 dirname = os.path.dirname(__file__)
-path = os.path.join(dirname, "../generated_maps/map.csv")
+path = os.path.join(dirname, args.output) 
 
 with open(path, 'w+', newline='') as f:
     writer = csv.writer(f, delimiter="|" , quoting = csv.QUOTE_NONE)

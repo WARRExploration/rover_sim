@@ -3,11 +3,21 @@
 from collada import *
 import numpy as np
 import os
+from argparse import ArgumentParser
+
+
+parser = ArgumentParser(description = "Creates heightmap mesh from .csv to .dae")
+parser.add_argument("-i", "--input", type=str, help = "Path to heightmap .csv file",
+                    nargs="?", default="../providedFiles/erc2018/DTM_ver2.csv")
+parser.add_argument("-o", "--output", type=str, help = "Path to generated .dae heightmap mesh",
+                    nargs="?", default="../models/terrain.dae")
+
+args = parser.parse_args()
 
 dirname = os.path.dirname(__file__)
 
 # load heights from *.csv file
-path = os.path.join(dirname, "../providedFiles/erc2018/DTM_ver2.csv")
+path = os.path.join(dirname, args.input)
 data = np.loadtxt(open(path, "rb"), delimiter=",", skiprows=2)
 data = np.moveaxis(np.flip(data, 0), 0, -1)
 cols, rows = data.shape
@@ -121,5 +131,5 @@ mesh.scenes.append(myscene)
 mesh.scene = myscene
 
 #save document to file
-path = os.path.join(dirname, "../models/terrain.dae")
+path = os.path.join(dirname, args.output)
 mesh.write(path)
