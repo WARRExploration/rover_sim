@@ -27,14 +27,14 @@
         <collision name="collision">
           <geometry>
             <mesh>
-              <uri>model://rover_sim/worlds/Generated/terrain.dae</uri>
+              <uri>model://rover_sim/worlds/Generated/terrain/terrain.dae</uri>
             </mesh>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <mesh>
-              <uri>model://rover_sim/worlds/Generated/terrain.dae</uri>
+              <uri>model://rover_sim/worlds/Generated/terrain/terrain.dae</uri>
             </mesh>
           </geometry>
         </visual>

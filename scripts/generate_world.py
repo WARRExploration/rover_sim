@@ -34,7 +34,7 @@ landmarks_csv = op.join(gen_files, "Landmarks.csv")
 heightmap_csv = op.join(gen_files, "Heightmap.csv")
 
 # There is still no solution to the relative path issue:
-terran_path = "model://rover_sim/worlds/" + args.world + "/terrain.dae"
+terran_path = "model://rover_sim/worlds/" + args.world + "/terrain/terrain.dae"
 
 
 
@@ -73,15 +73,10 @@ if args.random:
     subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
                 "--output", heightmap_csv])
 
-# is the png image still necessary?
-subprocess.call(["python", op.join(dirname, "generate_heightmap.py"),
-                "--input", heightmap_csv,
-                "--output", op.join(base_path, "heightmap.png")])
-
  
-subprocess.call(["python", op.join(dirname, "generate_mesh.py"),
+subprocess.call(["python", op.join(dirname, "generate_terrain.py"),
                 "--input", heightmap_csv,
-                "--output", op.join(base_path, "terrain.dae")])
+                "--output", op.join(base_path, "terrain")])
 
 
 # World file
