@@ -6,7 +6,7 @@ import os
 ######### DEFAULT VALUES #########
 
 defaults = {
-    "size": ([21.0, 29.7], "the size of the marker in cm"),
+    "size": ([21.0, 29.7], "the size of the whole landmark (cm)"),
     "resolution": (100, "the resolution (pixel per cm)"),
 
     "text_size": (6, "the maximal height of the text (cm)"),
@@ -250,7 +250,7 @@ def create_texture(number_of_marker, output_file_path, font_path, config = {}):
 
 if __name__ == '__main__':
     
-    from argparse import ArgumentParser
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
     # get path of package
     from rospkg import RosPack
@@ -258,20 +258,21 @@ if __name__ == '__main__':
     rover_sim_dir = rospack.get_path('rover_sim')
     # get default font path
     font_path = os.path.join(rover_sim_dir, 'resources/marker/Roboto-Bold.ttf')
+    default_texture_path='texture.png'
 
     # parse command line arguments
     parser = ArgumentParser(
-        description="""
-            generates a texture like the landmarks of the ERC
-        """)
+        description="generates a texture like the landmarks of the ERC",
+    )
     parser.add_argument("number", type=int, help="the number of the marker to generate")
-    parser.add_argument("-o", "--output", type=str, help="the output file and path to the texture which will be created in this process", default="terrain.png")
-    parser.add_argument("-f", "--font", type=str, help="path to the font (ttf)", default=font_path)
+    parser.add_argument("-o", "--output", type=str, help="the output file and path to the texture which will be created in this process (default: " + default_texture_path + ")", default=default_texture_path)
+    parser.add_argument("-f", "--font", type=str, help="path to the font (ttf) (default: " + font_path + ")", default=font_path)
     parser.add_argument("-c", "--config", type=str, help="path to a json config file with the following possible parameters (they will be overritten if given here explicitly)")
 
     # generate arguments for all the layout parameters
     for key, element in defaults.iteritems():
         value, arg_help = element
+        arg_help += " (default: " + str(value) + ")"
         # ensure that list (like colors) need more parameters (use the length of the default valuess)
         if type(value) is list:
             parser.add_argument("--" + key, help=arg_help, type=type(value[0]), nargs=len(value))
