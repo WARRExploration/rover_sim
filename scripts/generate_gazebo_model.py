@@ -32,7 +32,7 @@ def create_model_config(name, output_file_path, description=None):
     
     Arguments:
         name {str} -- name of the model
-        output_file_path {str} -- path of the generated file
+        output_file_path {str} -- path of the folder where the config file should be generated
     
     Keyword Arguments:
         description {str} -- optional description of the model (default: {None})
@@ -60,7 +60,7 @@ def create_model_config(name, output_file_path, description=None):
         config.append(description_node)
 
     tree = etree.ElementTree(config)
-    tree.write(output_file_path, pretty_print=True, encoding='utf8', xml_declaration=True)
+    tree.write(os.path.join(output_file_path, 'model.config'), pretty_print=True, encoding='utf8', xml_declaration=True)
 
 
 def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], collision_model_file_path=None):
@@ -69,7 +69,7 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     Arguments:
         name {str} -- name of the model
         model_file_path {str} -- path to the model in sdf format (model://...)
-        output_file_path {str} -- path of the generated file
+        output_file_path {str} -- path of the folder where the sdf file should be generated
     
     Keyword Arguments:
         pose {list} -- static pose of the model (default: {[0, 0, 0, 0, 0, 0]})
@@ -138,7 +138,7 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     sdf.append(model)
 
     tree = etree.ElementTree(sdf)
-    tree.write(output_file_path, pretty_print=True, encoding='utf8', xml_declaration=True)
+    tree.write(os.path.join(output_file_path, 'model.sdf'), pretty_print=True, encoding='utf8', xml_declaration=True)
 
 
 def create_gazebo_model(name, output_folder, template_model_file_path, texture_path, pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_collision_model_file_path=None, description=None):
@@ -197,7 +197,7 @@ def create_gazebo_model(name, output_folder, template_model_file_path, texture_p
 
     create_model_config(
         name,  
-        output_file_path= os.path.join(output_folder, 'model.config'),
+        output_file_path= output_folder,
         description=description
     )
 
@@ -213,7 +213,7 @@ def create_gazebo_model(name, output_folder, template_model_file_path, texture_p
         model_file_path= model_file_path,
         pose= pose,
         size= size,
-        output_file_path= os.path.join(output_folder, 'model.sdf'),
+        output_file_path=output_folder,
         collision_model_file_path=collision_model_file_path
     )
 

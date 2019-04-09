@@ -22,8 +22,6 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
         pose {list} -- the pose of the model (default: {[0, 0, 0, 0, 0, 0]})
     """
 
-
-    
     font_path = os.path.join(rover_sim_dir, 'resources/marker/Roboto-Bold.ttf')
     template_path = os.path.join(rover_sim_dir, 'resources/marker/Roboto-Bold.ttf')
     size = [0.210, 0.210, 0.297]
