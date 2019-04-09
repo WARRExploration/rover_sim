@@ -82,8 +82,8 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     model = etree.Element('model')
     model.set('name', name)
 
-    pose = etree.Element('pose')
-    pose.text = ' '.join(map(str, pose))
+    pose_node = etree.Element('pose')
+    pose_node.text = ' '.join(map(str, pose))
 
     static = etree.Element('static')
     static.text = 'true'
@@ -131,7 +131,7 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     
     model.append(link)
     
-    model.append(pose)
+    model.append(pose_node)
     model.append(static)
     model.append(link)
 
