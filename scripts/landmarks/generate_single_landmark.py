@@ -23,7 +23,8 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
     """
 
     font_path = os.path.join(rover_sim_dir, 'resources/landmarks/Roboto-Bold.ttf')
-    template_path = os.path.join(rover_sim_dir, 'resources/landmarks/Roboto-Bold.ttf')
+    template_vis = os.path.join(rover_sim_dir, 'resources/landmarks/marker.dae')
+    template_col = os.path.join(rover_sim_dir, 'resources/landmarks/marker_coll.dae')
     size = [0.210, 0.210, 0.297]
 
     temp_texture_path = '/tmp/landmark.png'
@@ -32,7 +33,16 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
     create_texture(number, temp_texture_path, font_path)
 
     # generate gazebo model
-    create_gazebo_model(name, os.path.join(output_folder, name), template_path, temp_texture_path, pose, description="Landmark for the ERC")
+    #create_gazebo_model(name, os.path.join(output_folder, name), template_path, temp_texture_path, pose, description="Landmark for the ERC")
+    create_gazebo_model(
+        name=name, 
+        output_folder=os.path.join(output_folder, name), 
+        template_model_file_path=template_vis, 
+        texture_path=temp_texture_path,
+        pose=pose, size=size, 
+        template_collision_model_file_path=template_col,
+        description="Landmark for the ERC"
+    )
 
     # remove temporary texture
     os.remove(temp_texture_path)

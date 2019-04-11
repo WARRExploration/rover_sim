@@ -30,7 +30,7 @@
     <model name="landmarks">
       <model name="L1">
         <include>
-          <uri>model://rover_sim/models/landmarks/L3</uri>
+          <uri>model://rover_sim/models/landmarks/L1</uri>
           <pose>12.70 7.70 1.80 0 0 0</pose>
         </include>
       </model>
