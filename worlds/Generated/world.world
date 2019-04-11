@@ -10,7 +10,7 @@
     <model name="landmarks">
       <model name="L1">
         <include>
-          <uri>model://rover_sim/models/landmarks/L1</uri>
+          <uri>model://landmarks/L1</uri>
           <pose>12.70 7.70 1.80 0 0 0</pose>
         </include>
       </model>
@@ -27,19 +27,22 @@
         <collision name="collision">
           <geometry>
             <mesh>
-              <uri>model://rover_sim/worlds/Generated/terrain/terrain.dae</uri>
+              <uri>model://terrain/terrain.dae</uri>
             </mesh>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <mesh>
-              <uri>model://rover_sim/worlds/Generated/terrain/terrain.dae</uri>
+              <uri>model://terrain/terrain.dae</uri>
             </mesh>
           </geometry>
         </visual>
       </link>
       <pose>0 0 0 0 0 0</pose>
     </model>
+    <include>
+      <uri>model://rover_sim/models/names/Logo</uri>
+    </include>
   </world>
 </sdf>
