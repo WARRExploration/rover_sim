@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF8'?>
+<sdf version="1.6">
+  <model name="L10">
+    <pose>0 0 0 0 0 0</pose>
+    <static>true</static>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://rover_sim/models/landmarks/L10/meshes/marker10.dae</uri>
+            <scale>0.21 0.21 0.297</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://rover_sim/models/landmarks/L10/meshes/marker_coll.dae</uri>
+            <scale>0.21 0.21 0.297</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
