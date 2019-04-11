@@ -3,7 +3,7 @@ from lxml import etree
 import csv
 import os, sys
 from rospkg import RosPack
-hash
+
 # import relative to rover_sim
 rospack = RosPack()
 rover_sim_dir = rospack.get_path('rover_sim')
@@ -13,25 +13,24 @@ from rover_sim.scripts.landmarks.generate_single_landmark import create_single_l
 from rover_sim.scripts.generate_gazebo_model import create_model_config
 
 
-def create_landmarks_sdf(input_csv_path, output_path):
-    """generate the sdf file for the landmarks gazebo model which includes all the models needed in the scene
-
+def all_landmarks_model(input_csv_path):
+    """generates the xml tree for the landmarks model
+    
     Arguments:
         input_csv_path {str} -- path to the csv file which contains the positions of the landmarks
-        output_path {str} -- path to the folder where the sdf file should be placed
+    
+    Returns:
+        object -- xml tree for the landmarks model
     """
 
     landmark_model_relative_path = "models"
 
+    landmarks = etree.Element('model')
+    landmarks.set('name', 'landmarks')
+    
     with open (input_csv_path) as csvfile:
         reader = csv.reader(csvfile)
         next(reader, None)
-
-        sdf = etree.Element('sdf')
-        sdf.set('version', '1.6')
-
-        landmarks = etree.Element('model')
-        landmarks.set('name', 'landmarks')
         
         # create landmark model and include it for each landmark in the file
         for row in reader:
@@ -59,13 +58,28 @@ def create_landmarks_sdf(input_csv_path, output_path):
             model.append(include)
             
             landmarks.append(model)
-
-
-        sdf.append(landmarks)
-
-        tree = etree.ElementTree(sdf)
-        tree.write(os.path.join(output_path, 'model.sdf'), pretty_print=True, encoding='utf8', xml_declaration=True)
     
+    return landmarks
+
+
+def create_landmarks_sdf(input_csv_path, output_path):
+    """generate the sdf file for the landmarks gazebo model which includes all the models needed in the scene
+
+    Arguments:
+        input_csv_path {str} -- path to the csv file which contains the positions of the landmarks
+        output_path {str} -- path to the folder where the sdf file should be placed
+    """
+
+    sdf = etree.Element('sdf')
+    sdf.set('version', '1.6')
+
+    landmarks = all_landmarks_model(input_csv_path)
+
+    sdf.append(landmarks)
+
+    tree = etree.ElementTree(sdf)
+    tree.write(os.path.join(output_path, 'model.sdf'), pretty_print=True, encoding='utf8', xml_declaration=True)
+
 def create_landmarks(name, input_csv_path, output_path):
     """create the landmarks gazebo model which includes all the landmarks specified in the csv file (it will automatically generate those landmarks)
     
@@ -105,7 +119,7 @@ if __name__ == '__main__':
         This script takes locations of the landmarks on the field from a csv file \
             and adds textured models at the appropriate locations to some gazebo sdf model to be <include>ed in a world file",
         formatter_class=ArgumentDefaultsHelpFormatter    
-)
+    )
     parser.add_argument("input_csv_path", type=str, help = "path to landmarks csv file")
     parser.add_argument("output_path", type=str, help = "path where the gazebo model should be generated")
     parser.add_argument("-n", "--name", type=str, help = "name of the gazebo model", default="landmarks")
