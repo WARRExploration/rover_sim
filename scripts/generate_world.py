@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 #!/usr/bin/env python
-=======
->>>>>>> master
 """
 This script calls all the necessary generation scripts and creates a world folder
 from specified provided files. If the world already exists, it replaces 
@@ -38,18 +35,17 @@ print(args)
 dirname = op.dirname(__file__)
 base_path = op.join(dirname, op.pardir, "worlds", args.world)
 world_file = op.join(base_path, "world.world")
-gen_files = op.join(base_path, "generationFiles")
 
-landmarks_csv = op.join(gen_files, "Landmarks.csv")
-heightmap_csv = op.join(gen_files, "Heightmap.csv")
+landmarks_csv = op.join(base_path, "Landmarks.csv")
+heightmap_csv = op.join(base_path, "Heightmap.csv")
 
 # There is still no solution to the relative path issue:
 terran_path = "model://rover_sim/worlds/" + args.world + "/terrain/terrain.dae"
 
 
 
-if not op.isdir(gen_files):
-    os.makedirs(gen_files)
+if not op.isdir(base_path):
+    os.makedirs(base_path)
 
 if args.landmarks is not None:
     copyfile(args.landmarks, landmarks_csv)
@@ -136,7 +132,7 @@ replace_elem("model[@name='terrain']", terran)
 
 
 # Landmarks
-landmarks = all_landmarks_model(landmarks_csv)
+landmarks = all_landmarks_model(landmarks_csv, op.join(rover_sim_dir, "models", "landmarks"))
 
 replace_elem("model[@name='landmarks']", landmarks)
 

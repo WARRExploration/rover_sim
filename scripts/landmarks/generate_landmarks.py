@@ -13,8 +13,9 @@ from rover_sim.scripts.landmarks.generate_single_landmark import create_single_l
 from rover_sim.scripts.generate_gazebo_model import create_model_config
 
 
-def all_landmarks_model(input_csv_path):
+def all_landmarks_model(input_csv_path, landmark_models_path):
     """generates the xml tree for the landmarks model
+        and calls 'generate_single_landmark' to create all the landmark models required by the csv
     
     Arguments:
         input_csv_path {str} -- path to the csv file which contains the positions of the landmarks
@@ -23,7 +24,7 @@ def all_landmarks_model(input_csv_path):
         object -- xml tree for the landmarks model
     """
 
-    landmark_model_relative_path = "models"
+    landmark_models_path = "models/landmarks"
 
     landmarks = etree.Element('model')
     landmarks.set('name', 'landmarks')
@@ -40,7 +41,7 @@ def all_landmarks_model(input_csv_path):
             # TODO: check if it there is already a model with this name
             # create a single landmark model
             # (we define the pose in the <include>)
-            create_single_landmark(landmark_name, int(i), os.path.join(rover_sim_dir, landmark_model_relative_path))
+            create_single_landmark(landmark_name, int(i), os.path.join(rover_sim_dir, landmark_models_path))
 
             model = etree.Element('model')
             model.set('name', landmark_name)
@@ -62,7 +63,7 @@ def all_landmarks_model(input_csv_path):
     return landmarks
 
 
-def create_landmarks_sdf(input_csv_path, output_path):
+def create_landmarks_sdf(input_csv_path, output_path, landmark_models_path):
     """generate the sdf file for the landmarks gazebo model which includes all the models needed in the scene
 
     Arguments:
@@ -73,20 +74,21 @@ def create_landmarks_sdf(input_csv_path, output_path):
     sdf = etree.Element('sdf')
     sdf.set('version', '1.6')
 
-    landmarks = all_landmarks_model(input_csv_path)
+    landmarks = all_landmarks_model(input_csv_path, landmark_models_path)
 
     sdf.append(landmarks)
 
     tree = etree.ElementTree(sdf)
     tree.write(os.path.join(output_path, 'model.sdf'), pretty_print=True, encoding='utf8', xml_declaration=True)
 
-def create_landmarks(name, input_csv_path, output_path):
+def create_landmarks(name, input_csv_path, output_path, landmark_models_path):
     """create the landmarks gazebo model which includes all the landmarks specified in the csv file (it will automatically generate those landmarks)
     
     Arguments:
         name {str} -- name of the gazebo model
         input_csv_path {str} -- path to the csv file which contains the positions of the landmarks
-        output_path {str} -- path to the folder where the model should be placed
+        output_path {str} -- path to the folder where the model will be placed
+        landmark_models_path {str} -- path to the folder where the individual landmark models will be placed
     """
 
 
@@ -108,7 +110,7 @@ def create_landmarks(name, input_csv_path, output_path):
     create_model_config(name, model_path)
 
     # generate sdf
-    create_landmarks_sdf(input_csv_path, model_path)
+    create_landmarks_sdf(input_csv_path, model_path, landmark_models_path)
 
 if __name__ == '__main__':
 
@@ -122,7 +124,8 @@ if __name__ == '__main__':
     )
     parser.add_argument("input_csv_path", type=str, help = "path to landmarks csv file")
     parser.add_argument("output_path", type=str, help = "path where the gazebo model should be generated")
+    parser.add_argument("landmark_models_path", type=str, help = "path where the individual landmark models should be generated")
     parser.add_argument("-n", "--name", type=str, help = "name of the gazebo model", default="landmarks")
     args = parser.parse_args()
 
-    create_landmarks(args.name, args.input_csv_path, args.output_path)
+    create_landmarks(args.name, args.input_csv_path, args.output_path, args.landmark_models_path)

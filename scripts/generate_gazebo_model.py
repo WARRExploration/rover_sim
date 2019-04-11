@@ -239,7 +239,7 @@ if __name__ == '__main__':
     parser.add_argument("texture", type=str, help="path to the texture which should be mapped on the mesh (texture will be copied)")
     parser.add_argument("-c", "--collision", type=str, help="path to the collisin mesh template")
     parser.add_argument("-o", "--output", type=str, help="path to the folder where the model should be generated, the path will be created", default=output_folder)
-    parser.add_argument("-p", "--pose", type=float, help="path to the folder where the model should be generated, the path will be created", default=[0, 0, 0, 0, 0, 0], nargs=6)
+    parser.add_argument("-p", "--pose", type=float, help="position and rotation of the model", default=[0, 0, 0, 0, 0, 0], nargs=6)
     parser.add_argument("-s", "--size", type=str, help="path to the folder where the model should be generated, the path will be created", default=[1, 1, 1], nargs=3)
     parser.add_argument("-d", "--description", type=str, help="small description of the model")
     args = parser.parse_args()

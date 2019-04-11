@@ -7,7 +7,7 @@ import os
 
 defaults = {
     "size": ([21.0, 29.7], "the size of the whole landmark (cm)"),
-    "resolution": (100, "the resolution (pixel per cm)"),
+    "resolution": (5, "the resolution (pixel per cm)"),
 
     "text_size": (6, "the maximal height of the text (cm)"),
     "text_offset_side": (1, "the minimal border at the sides for the text (cm)"),
@@ -44,7 +44,7 @@ def getC(config, key):
 
 #########
 
-def generater_marker_image(number_of_marker, size):
+def generate_marker_image(number_of_marker, size):
     """generates the black and white marker with the script of the ar_track_alvar package (make sure to install it first)
     
     Arguments:
@@ -61,7 +61,7 @@ def generater_marker_image(number_of_marker, size):
     os.system('cd /tmp; rosrun ar_track_alvar createMarker -u ' + str(size) + ' -s 1 ' + str(number_of_marker))
     marker = Image.open(temp_marker_path)
 
-    # delete temporary file from /tep folder
+    # delete temporary file from /tmp folder
     os.remove(temp_marker_path)
 
     return marker
@@ -194,7 +194,7 @@ def create_texture(number_of_marker, output_file_path, font_path, config = {}):
     text_offset_side = getC(config, "text_offset_side") * resolution
     text_offset_top = getC(config, "text_offset_top") * resolution
 
-    # draw the decibal number
+    # draw the decimal number
     draw_centered_text_inside_rectangle(
         d, 
         str(number_of_marker), 
@@ -242,7 +242,7 @@ def create_texture(number_of_marker, output_file_path, font_path, config = {}):
     marker_offset_top = getC(config, "marker_offset_top") * resolution
 
     # generate marker and draw to canvas
-    marker = generater_marker_image(number_of_marker, marker_size)
+    marker = generate_marker_image(number_of_marker, marker_size)
     img.paste(marker, (int((page_width - marker_size) / 2.0), int(marker_offset_top)))
 
     # save the texture
@@ -257,14 +257,14 @@ if __name__ == '__main__':
     rospack = RosPack()
     rover_sim_dir = rospack.get_path('rover_sim')
     # get default font path
-    font_path = os.path.join(rover_sim_dir, 'resources/marker/Roboto-Bold.ttf')
+    font_path = os.path.join(rover_sim_dir, 'resources/landmarks/Roboto-Bold.ttf')
     default_texture_path='texture.png'
 
     # parse command line arguments
     parser = ArgumentParser(
         description="generates a texture like the landmarks of the ERC",
     )
-    parser.add_argument("number", type=int, help="the number of the marker to generate")
+    parser.add_argument("number", type=int, help="the number of the landmark texture to generate")
     parser.add_argument("-o", "--output", type=str, help="the output file and path to the texture which will be created in this process (default: " + default_texture_path + ")", default=default_texture_path)
     parser.add_argument("-f", "--font", type=str, help="path to the font (ttf) (default: " + font_path + ")", default=font_path)
     parser.add_argument("-c", "--config", type=str, help="path to a json config file with the following possible parameters (they will be overritten if given here explicitly)")

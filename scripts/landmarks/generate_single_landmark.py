@@ -22,8 +22,8 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
         pose {list} -- the pose of the model (default: {[0, 0, 0, 0, 0, 0]})
     """
 
-    font_path = os.path.join(rover_sim_dir, 'resources/marker/Roboto-Bold.ttf')
-    template_path = os.path.join(rover_sim_dir, 'resources/marker/Roboto-Bold.ttf')
+    font_path = os.path.join(rover_sim_dir, 'resources/landmarks/Roboto-Bold.ttf')
+    template_path = os.path.join(rover_sim_dir, 'resources/landmarks/Roboto-Bold.ttf')
     size = [0.210, 0.210, 0.297]
 
     temp_texture_path = '/tmp/landmark.png'
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     )
     parser.add_argument("number", type=int, help="number of the landmark")
     parser.add_argument("-o", "--output", type=str, help="path to the output folder where the model should be generated", default=output_folder)
-    parser.add_argument("-p", "--pose", type=float, help="path to the folder where the model should be generated, the path will be created", default=[0, 0, 0, 0, 0, 0], nargs=6)
+    parser.add_argument("-p", "--pose", type=float, help="position and rotation of the model", default=[0, 0, 0, 0, 0, 0], nargs=6)
     args = parser.parse_args()
 
     # generate model
