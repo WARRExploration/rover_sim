@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+generate the the texure and the mesh of a ERC terrain in a specified folder
+"""
+
 
 from collada import *
 import numpy as np
@@ -248,7 +252,7 @@ def generate_collada(coords, relative_texture_path):
 
 
 def generate_terrain(csv_file_path, output_folder, terrain_name):
-    """generate the texure and the mesh of a ERC terrain in a specified folder
+    """generate the texture and the mesh of a ERC terrain in a specified folder
 
     Arguments:
         csv_file_path {str} -- path to the ERC csv file (ver2)
@@ -297,16 +301,18 @@ if __name__ == '__main__':
     rover_sim_dir = rospack.get_path('rover_sim')
     
     # default values
+    csv_file_path = os.path.join(
+        rover_sim_dir, 'providedFiles/erc2018/DTM_ver2.csv')
     output_folder = os.path.join(rover_sim_dir, 'models/terrain')
     terrain_name = 'terrain'
 
     # parse command line arguments
     parser = ArgumentParser(
-        description="generate the texure and the mesh of a ERC terrain in a specified folder",
+        description="generate the texture and the mesh of a ERC terrain in a specified folder",
         formatter_class=ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument("input", type=str, help="path to the ERC csv file (ver2)")
-    parser.add_argument("-o", "--output", type=str, help="path to the folder where the files should be generated, the path will be created", default=output_folder)
+    parser.add_argument("-i", "--input", type=str, help="path to the ERC csv file (ver2)", default=csv_file_path)
+    parser.add_argument("-o", "--output", type=str, help="path to the folder where the files (.png and .dae) should be generated, the path will be created", default=output_folder)
     parser.add_argument("-n", "--name", type=str, help="name of the terrain collada file", default=terrain_name)
     args = parser.parse_args()
 

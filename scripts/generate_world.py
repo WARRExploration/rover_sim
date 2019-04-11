@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 #!/usr/bin/env python
+=======
+>>>>>>> master
 """
 This script calls all the necessary generation scripts and creates a world folder
 from specified provided files. If the world already exists, it replaces 
@@ -28,6 +31,8 @@ parser.add_argument("-m", "--heightmap", type=str, help = "Path to heightmap csv
 parser.add_argument("-r", "--random", action="store_true", help = "Random heightmap and landmarks")
 
 args = parser.parse_args()
+print(args)
+
 
 
 dirname = op.dirname(__file__)
