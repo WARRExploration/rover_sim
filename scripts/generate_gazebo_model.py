@@ -164,7 +164,10 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         if not os.path.isdir(base_path):
             raise ValueError('There is already a file with this name: ' + base_path)
         elif os.listdir(base_path):
-            raise ValueError('The folder is not empty: ' + base_path)
+            #raise ValueError('The folder is not empty: ' + base_path)
+            print('The folder is not empty: ' + base_path)
+            print('Skipping creation, leaving old model\n')
+            return
 
     # generate it if necessary
     else:

@@ -10,7 +10,7 @@ import os.path as op
 import os, sys
 import copy
 from argparse import ArgumentParser
-from shutil import copy2, copyfile
+import shutil
 import subprocess
 
 from rospkg import RosPack
@@ -22,16 +22,17 @@ sys.path.append(os.path.dirname(rover_sim_dir))
 
 from rover_sim.scripts.landmarks.generate_landmarks import create_landmarks
 from rover_sim.scripts.generate_terrain import generate_terrain
+from rover_sim.scripts.generate_random_heightmap import create_random_heightmap
 
 
-def create_world(name,  landmarks, heightmap, random=False):
+def create_world(name, template_dir, landmarks, heightmap, random=False):
     """generates a full gazebo model for a ERC landmark
     
     Arguments:
         name {str} -- name of the generated world in rover_sim/worlds
+        template_dir {str} -- template folder with correctly named resources for generation
         landmarks {str} -- path to landmarks csv file
         heightmap {str} -- path to heightmap csv file (ERC ver2)
-    TODO is {bool} correct here?
         random {bool} -- create a random heightmap custom to world (default: {False})
     """
 
@@ -40,39 +41,88 @@ def create_world(name,  landmarks, heightmap, random=False):
     base_path = op.join(dirname, op.pardir, "worlds", name)
     custom_models = op.join(base_path, "models")
 
-    world_file = op.join(base_path, "world.world")
-    landmarks_csv = op.join(base_path, "Landmarks.csv")
-    heightmap_csv = op.join(base_path, "Heightmap.csv")
-
+    world_name = "world"
     terran_name = "terrain"
     all_landmarks = "all_landmarks"
+    landmarks_name = "Landmarks"
+    heightmap_name = "Heightmap"
+
+    world_file = op.join(base_path, world_name + ".world")
+    landmarks_csv = op.join(base_path, landmarks_name + ".csv")
+    heightmap_csv = op.join(base_path, heightmap_name + ".csv")
 
 
+    if not op.isdir(base_path):
+        os.makedirs(base_path)
 
-    if not op.isdir(custom_models):
-        os.makedirs(custom_models)
+    
+
+    ## Create or pull in Resources
+
+    if random:
+        # need the subprocess call because random_heightmap uses python3
+        subprocess.call(["python3", op.join(dirname, "generate_random_heightmap.py"),
+                "--output", heightmap_csv])
+    
+    #TODO add generate_random_landmarks.py once the script is ready
+
+
+    if template_dir is not None:
+        template_land = op.join(template_dir, landmarks_name + ".csv")
+        if op.exists(template_land):
+            shutil.copyfile(template_land, landmarks_csv)
+
+        template_height = op.join(template_dir, heightmap_name + ".csv")
+        if op.exists(template_height):
+            shutil.copyfile(template_height, heightmap_csv)
+
 
     if landmarks is not None:
-        copyfile(landmarks, landmarks_csv)
+        shutil.copyfile(landmarks, landmarks_csv)
 
     if heightmap is not None:
-        copyfile(heightmap, heightmap_csv)
+        shutil.copyfile(heightmap, heightmap_csv)
 
 
-    # Terrain and Landmarks generation
-    if random:
-        subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
-                    "--output", heightmap_csv])
+    if not os.path.exists(heightmap_csv):
+        raise ValueError(" heightmap file needed at " + heightmap_csv 
+                        + "\nProvide one manually or run generate_world with 'random' flag")
+    
+    if not os.path.exists(landmarks_csv):
+        raise ValueError("landmark file needed at " + landmarks_csv 
+                        + "\nProvide one manually or run generate_world with 'random' flag")
+
+        
+
+    ## Generate the Models from the Resources
+
+    if os.path.exists(custom_models):
+        if not os.path.isdir(custom_models):
+            raise ValueError("'models' has to be a directory, found file at " + custom_models)
+        else:
+            backup = custom_models + ".backup"
+            if os.path.exists(backup):
+                print("Removing the old backup folder")
+                shutil.rmtree(backup)
+            print("Copying old 'models' folder to backup at " + backup + "\n")
+            os.rename(custom_models, backup)
+    
+    os.mkdir(custom_models)
 
 
     generate_terrain(name=terran_name, csv_file_path=heightmap_csv, output_folder=custom_models)
 
-    #all_landmarks_model(landmarks_csv, op.join(rover_sim_dir, "models", "landmarks")) # ↓TODO
+                                                                                                                             # ↓TODO
     create_landmarks(name=all_landmarks, input_csv_path=landmarks_csv, output_path=custom_models, landmark_models_path="/tmp/not_used_yet_TODO")
 
 
-    # .world file creation, not modified if already present
-    if not op.exists(world_file):    
+
+    ## Create .world file
+
+    if op.exists(world_file):
+        print("World file found at " + world_file)
+        print("Skipping creation, leaving old world file\n")
+    else:
         root = etree.Element('sdf')
         root.set("version", "1.3")
         tree = etree.ElementTree (root)
@@ -117,10 +167,12 @@ if __name__ == '__main__':
     )
 
     parser.add_argument("-w", "--world", type=str, help = "World name, updates world if already exists", nargs="?", default="Generated")
+    parser.add_argument("-t", "--template", type=str, help = "Template folder with correctly named Resources for generation.\n"
+                                                            + "Overridden by individual resource arguments like '-l'. Use this to create world with same settings as old one")
     parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file")
     parser.add_argument("-m", "--heightmap", type=str, help = "Path to heightmap csv file (ERC ver2)")
     parser.add_argument("-r", "--random", action="store_true", help = "Random heightmap and landmarks")
     args = parser.parse_args()
 
     # generate model
-    create_world(name=args.world, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random)
+    create_world(name=args.world, template_dir=args.template, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random)

@@ -4,7 +4,7 @@ generate the the texure and the mesh of a ERC terrain in a specified folder
 """
 
 
-from collada import *
+from collada import source, geometry, material, scene, Collada
 import numpy as np
 import os, sys
 from shutil import copyfile
@@ -210,7 +210,6 @@ def generate_collada(coords, relative_texture_path):
         'normals-array', generate_normal_array(coords), ('X', 'Y', 'Z'))
     uv_src = source.FloatSource(
         'uv-array', generate_uv_array(coords), ('S', 'T'))
-    print(source)
 
     # create geometry and add the sources
     geom = geometry.Geometry(mesh, 'geometry', 'terrain', [

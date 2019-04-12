@@ -100,7 +100,10 @@ def create_landmarks(name, input_csv_path, output_path, landmark_models_path):
         if not os.path.isdir(base_path):
             raise ValueError('There is already a file with this name')
         elif os.listdir(base_path):
-            raise ValueError('The folder is not empty')
+            #raise ValueError('The folder is not empty: ' + base_path)
+            print('The folder is not empty: ' + base_path)
+            print('Skipping creation, leaving old model')
+            return
 
     # generate it if necessary
     else:
