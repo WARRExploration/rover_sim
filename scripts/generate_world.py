@@ -19,7 +19,7 @@ rospack = RosPack()
 rover_sim_dir = rospack.get_path('rover_sim')
 sys.path.append(os.path.dirname(rover_sim_dir))
 
-from rover_sim.scripts.landmarks.generate_landmarks import all_landmarks_model
+from rover_sim.scripts.landmarks.generate_landmarks import create_landmarks
 
 parser = ArgumentParser(description = "Creates world in worlds directory")
 parser.add_argument("-w", "--world", type=str, help = "World name, updates world if already exists", nargs="?", default="Generated")
@@ -34,37 +34,42 @@ print(args)
 
 dirname = op.dirname(__file__)
 base_path = op.join(dirname, op.pardir, "worlds", args.world)
-world_file = op.join(base_path, "world.world")
+custom_models = op.join(base_path, "models")
 
+world_file = op.join(base_path, "world.world")
 landmarks_csv = op.join(base_path, "Landmarks.csv")
 heightmap_csv = op.join(base_path, "Heightmap.csv")
 
-# There is still no solution to the relative path issue:
-terran_path = "model://rover_sim/worlds/" + args.world + "/terrain/terrain.dae"
+terran_path = op.join(custom_models, "terrain")
+all_landmarks_path = op.join(custom_models, "all_landmarks")
 
 
 
-if not op.isdir(base_path):
-    os.makedirs(base_path)
+if not op.isdir(custom_models):
+    os.makedirs(custom_models)
 
 if args.landmarks is not None:
     copyfile(args.landmarks, landmarks_csv)
 
 if args.heightmap is not None:
     copyfile(args.heightmap, heightmap_csv)
-    
-# .world file
-if op.exists(world_file):
-    try:
-        tree = etree.parse(world_file, etree.XMLParser(remove_blank_text=True))
-        root = tree.getroot()
-        world = root.find("world")
 
-    except:
-        backup_name = world_file + ".backup"
-        os.rename(world_file, backup_name)
-        print ("World structure corrupted, creating a new world. \nOld file was saved as: \n " + backup_name)
-        
+
+# Terrain and Landmarks generation
+if args.random:
+    subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
+                "--output", heightmap_csv])
+
+
+# subprocess.call(["python", op.join(dirname, "generate_terrain.py"),
+#                 "--input", heightmap_csv,
+#                 "--output", op.join(base_path, "terrain")])
+
+#all_landmarks_model(landmarks_csv, op.join(rover_sim_dir, "models", "landmarks"))
+create_landmarks("all_landmarks", landmarks_csv, custom_models, "/tmp/not_used_yet_TODO")
+
+
+# .world file creation, not modified if already present
 if not op.exists(world_file):    
     root = etree.Element('sdf')
     root.set("version", "1.3")
@@ -73,38 +78,33 @@ if not op.exists(world_file):
     world.set("name", "default")
     root.append(world)
 
+    scene = etree.Element("scene")
+    grid = etree.SubElement(scene,"grid")
+    grid.text = "false"
+    world.append(scene)
 
-# Terrain generation
-if args.random:
-    subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
-                "--output", heightmap_csv])
-
- 
-subprocess.call(["python", op.join(dirname, "generate_terrain.py"),
-                "--input", heightmap_csv,
-                "--output", op.join(base_path, "terrain")])
-
-
-# World file
-
-def replace_elem(name, elem):
-    old_elem = world.find(name)
-    if old_elem is None:
-        world.append(elem)
-    else:
-        old_elem[:] = elem[:]
-
-scene = etree.Element("scene")
-grid = etree.SubElement(scene,"grid")
-grid.text = "false"
-replace_elem("scene", scene)
-
-include_sun = etree.Element("include")
-uri = etree.SubElement(include_sun,"uri")
-uri.text = "model://sun"
-replace_elem("include[1]",include_sun) # finds first <include>
+    include_sun = etree.Element("include")
+    uri = etree.SubElement(include_sun,"uri")
+    uri.text = "model://sun"
+    world.append(include_sun)
 
 
+    include_terrain = etree.Element("include")
+    uri = etree.SubElement(include_terrain,"uri")
+    uri.text = "model://terrain"
+    world.append(include_terrain)
+
+    include_landmarks = etree.Element("include")
+    uri = etree.SubElement(include_landmarks,"uri")
+    uri.text = "model://all_landmarks"
+    world.append(include_landmarks)
+
+
+    #print(etree.tostring(worl_file, pretty_print=True, encoding='utf8', xml_declaration=True))
+    tree.write(world_file, pretty_print=True, encoding='utf8', xml_declaration=True)
+
+
+'''
 # Terrain inclusion
 # should probably be its own script
 terran = etree.Element("model")
@@ -129,13 +129,5 @@ uri.text = terran_path
 pose = etree.SubElement(terran,"pose")
 pose.text = "0 0 0 0 0 0"
 replace_elem("model[@name='terrain']", terran)
+'''
 
-
-# Landmarks
-landmarks = all_landmarks_model(landmarks_csv, op.join(rover_sim_dir, "models", "landmarks"))
-
-replace_elem("model[@name='landmarks']", landmarks)
-
-#print(etree.tostring(worl_file, pretty_print=True, encoding='utf8', xml_declaration=True))
-
-tree.write(world_file, pretty_print=True, encoding='utf8', xml_declaration=True)

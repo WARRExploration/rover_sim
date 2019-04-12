@@ -140,28 +140,29 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     tree.write(os.path.join(output_file_path, 'model.sdf'), pretty_print=True, encoding='utf8', xml_declaration=True)
 
 
-def create_gazebo_model(name, output_folder, template_model_file_path, texture_path, pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_collision_model_file_path=None, description=None):
+def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture, 
+        pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_mesh_col=None, description=None):
     """generates a whole static gazebo model for a given mesh with texture
     
     Arguments:
-        name {str} -- name of the model
-        output_file_path {str} -- path of the generated model (has to be inside the rover_sim package)
-        template_model_file_path {str} -- path to the template mesh (will be copied)
-        texture_path {str} -- path to the texture (will be copied)
+        name {str} -- name of the model, mostly cosmetic
+        output_file_path {str} -- path of the generated model, including name (has to be inside the rover_sim package)
+        template_mesh_vis {str} -- path to the template mesh (will be copied)
+        template_texture {str} -- path to the texture (will be copied)
     
     Keyword Arguments:
         pose {list} -- static pose of the model (default: {[0, 0, 0, 0, 0, 0]})
         size {list} -- size of the model (default: {[1, 1, 1]})
-        template_collision_model_file_path {[type]} -- path to the template collision mesh (will be copied) (default: {None}, the normal model will be used as collision model instead)
+        template_mesh_col {str} -- optional path to a template collision mesh (will be copied) (default: {None})
         description {str} -- optional description of the model (default: {None})
     """
 
     # check if output folder exists (path to it)
     if os.path.exists(output_folder):
         if not os.path.isdir(output_folder):
-            raise ValueError('There is already a file with this name')
+            raise ValueError('There is already a file with this name: ' + output_folder)
         elif os.listdir(output_folder):
-            raise ValueError('The folder is not empty')
+            raise ValueError('The folder is not empty: ' + output_folder)
 
     # generate it if necessary
     else:
@@ -172,24 +173,24 @@ def create_gazebo_model(name, output_folder, template_model_file_path, texture_p
     os.makedirs(os.path.join(output_folder, 'meshes'))
 
     # copy texture
-    _, texture_extension = os.path.splitext(texture_path)
-    if not os.path.exists(texture_path):
-        raise ValueError('The texture file is missing in the folder ' + texture_path)
+    _, texture_extension = os.path.splitext(template_texture)
+    if not os.path.exists(template_texture):
+        raise ValueError('The texture file is missing in the folder ' + template_texture)
 
     relative_texture_path = 'textures/texture' + texture_extension
-    copyfile(texture_path, os.path.join(output_folder, relative_texture_path))
+    copyfile(template_texture, os.path.join(output_folder, relative_texture_path))
 
 
     # replace the texturepath in the template
     replace_texture_path_on_template(
-        template_file_path= template_model_file_path,
+        template_file_path= template_mesh_vis,
         output_file_path= os.path.join(output_folder, 'meshes/mesh.dae'),
         new_texture_relative_path= os.path.join('..',relative_texture_path)
     )
 
-    if template_collision_model_file_path:
+    if template_mesh_col:
         replace_texture_path_on_template(
-            template_file_path= template_collision_model_file_path,
+            template_file_path= template_mesh_col,
             output_file_path= os.path.join(output_folder, 'meshes/collision_mesh.dae'),
             new_texture_relative_path= os.path.join('..',relative_texture_path)
         )
@@ -206,7 +207,7 @@ def create_gazebo_model(name, output_folder, template_model_file_path, texture_p
 
     mesh_vis_path = 'model://rover_sim/' + relative_path + '/meshes/mesh.dae'
 
-    if template_collision_model_file_path:
+    if template_mesh_col:
         mesh_col_path = 'model://rover_sim/' + relative_path + '/meshes/collision_mesh.dae'
     else:
         mesh_col_path = None
@@ -251,10 +252,10 @@ if __name__ == '__main__':
     create_gazebo_model(
         name=args.name, 
         output_folder=os.path.join(args.output, args.name), 
-        template_model_file_path=args.template,
-        texture_path=args.texture,
+        template_mesh_vis=args.template,
+        template_texture=args.texture,
         pose=args.pose,
         size=args.size,
-        template_collision_model_file_path=args.collision,
+        template_mesh_col=args.collision,
         description=args.description
     )

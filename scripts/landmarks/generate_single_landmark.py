@@ -16,7 +16,7 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
     Arguments:
         name {str} -- name of the generated model
         number {int} -- number on the landmark
-        output_folder {str} -- path where the landmark model should be generated
+        output_folder {str} -- path to the output folder in which the model will be generated
     
     Keyword Arguments:
         pose {list} -- the pose of the model (default: {[0, 0, 0, 0, 0, 0]})
@@ -37,10 +37,10 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
     create_gazebo_model(
         name=name, 
         output_folder=os.path.join(output_folder, name), 
-        template_model_file_path=template_vis, 
-        texture_path=temp_texture_path,
+        template_mesh_vis=template_vis, 
+        template_texture=temp_texture_path,
         pose=pose, size=size, 
-        template_collision_model_file_path=template_col,
+        template_mesh_col=template_col,
         description="Landmark for the ERC"
     )
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         formatter_class=ArgumentDefaultsHelpFormatter    
     )
     parser.add_argument("number", type=int, help="number of the landmark")
-    parser.add_argument("-o", "--output", type=str, help="path to the output folder where the model should be generated", default=output_folder)
+    parser.add_argument("-o", "--output", type=str, help="path to the output folder in which the model should be generated", default=output_folder)
     parser.add_argument("-p", "--pose", type=float, help="position and rotation of the model", default=[0, 0, 0, 0, 0, 0], nargs=6)
     args = parser.parse_args()
 
