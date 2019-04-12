@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 This script calls all the necessary generation scripts and creates a world folder
 from specified provided files. If the world already exists, it replaces 
@@ -20,114 +21,106 @@ rover_sim_dir = rospack.get_path('rover_sim')
 sys.path.append(os.path.dirname(rover_sim_dir))
 
 from rover_sim.scripts.landmarks.generate_landmarks import create_landmarks
-
-parser = ArgumentParser(description = "Creates world in worlds directory")
-parser.add_argument("-w", "--world", type=str, help = "World name, updates world if already exists", nargs="?", default="Generated")
-parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file")
-parser.add_argument("-m", "--heightmap", type=str, help = "Path to heightmap csv file")
-parser.add_argument("-r", "--random", action="store_true", help = "Random heightmap and landmarks")
-
-args = parser.parse_args()
-print(args)
+from rover_sim.scripts.generate_terrain import generate_terrain
 
 
-
-dirname = op.dirname(__file__)
-base_path = op.join(dirname, op.pardir, "worlds", args.world)
-custom_models = op.join(base_path, "models")
-
-world_file = op.join(base_path, "world.world")
-landmarks_csv = op.join(base_path, "Landmarks.csv")
-heightmap_csv = op.join(base_path, "Heightmap.csv")
-
-terran_path = op.join(custom_models, "terrain")
-all_landmarks_path = op.join(custom_models, "all_landmarks")
-
+def create_world(name,  landmarks_csv, heightmap_csv, random=False):
+    """generates a full gazebo model for a ERC landmark
+    
+    Arguments:
+        name {str} -- name of the generated world in rover_sim/worlds
+        landmarks_csv {str} -- path to landmarks csv file
+        heightmap_csv {str} -- path to heightmap csv file (ERC ver2)
+    TODO is {bool} correct here?
+        random {bool} -- create a random heightmap custom to world (default: {False})
+    """
 
 
-if not op.isdir(custom_models):
-    os.makedirs(custom_models)
+    dirname = op.dirname(__file__)
+    base_path = op.join(dirname, op.pardir, "worlds", args.world)
+    custom_models = op.join(base_path, "models")
 
-if args.landmarks is not None:
-    copyfile(args.landmarks, landmarks_csv)
+    world_file = op.join(base_path, "world.world")
+    landmarks_csv = op.join(base_path, "Landmarks.csv")
+    heightmap_csv = op.join(base_path, "Heightmap.csv")
 
-if args.heightmap is not None:
-    copyfile(args.heightmap, heightmap_csv)
-
-
-# Terrain and Landmarks generation
-if args.random:
-    subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
-                "--output", heightmap_csv])
+    terran_name = "terrain"
+    all_landmarks = "all_landmarks"
 
 
-# subprocess.call(["python", op.join(dirname, "generate_terrain.py"),
-#                 "--input", heightmap_csv,
-#                 "--output", op.join(base_path, "terrain")])
 
-#all_landmarks_model(landmarks_csv, op.join(rover_sim_dir, "models", "landmarks"))
-create_landmarks("all_landmarks", landmarks_csv, custom_models, "/tmp/not_used_yet_TODO")
+    if not op.isdir(custom_models):
+        os.makedirs(custom_models)
 
+    if args.landmarks is not None:
+        copyfile(args.landmarks, landmarks_csv)
 
-# .world file creation, not modified if already present
-if not op.exists(world_file):    
-    root = etree.Element('sdf')
-    root.set("version", "1.3")
-    tree = etree.ElementTree (root)
-    world = etree.Element ('world')
-    world.set("name", "default")
-    root.append(world)
-
-    scene = etree.Element("scene")
-    grid = etree.SubElement(scene,"grid")
-    grid.text = "false"
-    world.append(scene)
-
-    include_sun = etree.Element("include")
-    uri = etree.SubElement(include_sun,"uri")
-    uri.text = "model://sun"
-    world.append(include_sun)
+    if args.heightmap is not None:
+        copyfile(args.heightmap, heightmap_csv)
 
 
-    include_terrain = etree.Element("include")
-    uri = etree.SubElement(include_terrain,"uri")
-    uri.text = "model://terrain"
-    world.append(include_terrain)
-
-    include_landmarks = etree.Element("include")
-    uri = etree.SubElement(include_landmarks,"uri")
-    uri.text = "model://all_landmarks"
-    world.append(include_landmarks)
+    # Terrain and Landmarks generation
+    if args.random:
+        subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
+                    "--output", heightmap_csv])
 
 
-    #print(etree.tostring(worl_file, pretty_print=True, encoding='utf8', xml_declaration=True))
-    tree.write(world_file, pretty_print=True, encoding='utf8', xml_declaration=True)
+    generate_terrain(name=terran_name, csv_file_path=heightmap_csv, output_folder=custom_models)
+
+    #all_landmarks_model(landmarks_csv, op.join(rover_sim_dir, "models", "landmarks")) # ↓TODO
+    create_landmarks(name=all_landmarks, input_csv_path=landmarks_csv, output_path=custom_models, landmark_models_path="/tmp/not_used_yet_TODO")
 
 
-'''
-# Terrain inclusion
-# should probably be its own script
-terran = etree.Element("model")
-terran.set("name","terrain")
-static = etree.SubElement(terran,"static")
-static.text = "true"
-link = etree.SubElement(terran,"link")
-link.set("name","link")
+    # .world file creation, not modified if already present
+    if not op.exists(world_file):    
+        root = etree.Element('sdf')
+        root.set("version", "1.3")
+        tree = etree.ElementTree (root)
+        world = etree.Element ('world')
+        world.set("name", "default")
+        root.append(world)
 
-coll = etree.SubElement(link,"collision")
-coll.set("name","collision")
-c_mesh = etree.SubElement(etree.SubElement(coll,"geometry"),"mesh") # :3
-uri = etree.SubElement(c_mesh,"uri")
-uri.text = terran_path
+        scene = etree.Element("scene")
+        grid = etree.SubElement(scene,"grid")
+        grid.text = "false"
+        world.append(scene)
 
-vis = etree.SubElement(link,"visual")
-vis.set("name","visual")
-v_mesh = etree.SubElement(etree.SubElement(vis,"geometry"),"mesh")
-uri = etree.SubElement(v_mesh,"uri")
-uri.text = terran_path
+        include_sun = etree.Element("include")
+        uri = etree.SubElement(include_sun,"uri")
+        uri.text = "model://sun"
+        world.append(include_sun)
 
-pose = etree.SubElement(terran,"pose")
-pose.text = "0 0 0 0 0 0"
-replace_elem("model[@name='terrain']", terran)
-'''
 
+        include_terrain = etree.Element("include")
+        uri = etree.SubElement(include_terrain,"uri")
+        uri.text = "model://terrain"
+        world.append(include_terrain)
+
+        include_landmarks = etree.Element("include")
+        uri = etree.SubElement(include_landmarks,"uri")
+        uri.text = "model://all_landmarks"
+        world.append(include_landmarks)
+
+
+        #print(etree.tostring(worl_file, pretty_print=True, encoding='utf8', xml_declaration=True))
+        tree.write(world_file, pretty_print=True, encoding='utf8', xml_declaration=True)
+
+
+if __name__ == '__main__':
+
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+    # parse command line arguments
+    parser = ArgumentParser(
+        description="Creates world in worlds directory",
+        formatter_class=ArgumentDefaultsHelpFormatter    
+    )
+
+    parser.add_argument("-w", "--world", type=str, help = "World name, updates world if already exists", nargs="?", default="Generated")
+    parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file")
+    parser.add_argument("-m", "--heightmap", type=str, help = "Path to heightmap csv file (ERC ver2)")
+    parser.add_argument("-r", "--random", action="store_true", help = "Random heightmap and landmarks")
+    args = parser.parse_args()
+
+    # generate model
+    create_world(name=args.world, landmarks_csv=args.landmarks, heightmap_csv=args.heightmap, random=args.random)

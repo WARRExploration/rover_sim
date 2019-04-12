@@ -8,7 +8,7 @@
         <geometry>
           <mesh>
             <uri>model://rover_sim/models/landmarks/L2/meshes/mesh.dae</uri>
-            <scale>1 1 1</scale>
+            <scale>0.21 0.21 0.297</scale>
           </mesh>
         </geometry>
       </visual>
@@ -16,7 +16,7 @@
         <geometry>
           <mesh>
             <uri>model://rover_sim/models/landmarks/L2/meshes/collision_mesh.dae</uri>
-            <scale>1 1 1</scale>
+            <scale>0.21 0.21 0.297</scale>
           </mesh>
         </geometry>
       </collision>
