@@ -36,7 +36,7 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
     #create_gazebo_model(name, os.path.join(output_folder, name), template_path, temp_texture_path, pose, description="Landmark for the ERC")
     create_gazebo_model(
         name=name, 
-        output_folder=os.path.join(output_folder, name), 
+        output_folder=output_folder, 
         template_mesh_vis=template_vis, 
         template_texture=temp_texture_path,
         pose=pose, size=size, 

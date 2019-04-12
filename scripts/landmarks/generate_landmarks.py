@@ -88,29 +88,29 @@ def create_landmarks(name, input_csv_path, output_path, landmark_models_path):
         name {str} -- name of the gazebo model
         input_csv_path {str} -- path to the csv file which contains the positions of the landmarks
         output_path {str} -- path to the folder where the model will be placed
-        landmark_models_path {str} -- path to the folder where the individual landmark models will be placed
+        landmark_models_path {str} -- path to the folder in which the individual landmark models will be placed
     """
 
 
-    model_path = os.path.join(output_path, name)
+    base_path = os.path.join(output_path, name)
 
     # create folder
     # check if output folder exists (path to it)
-    if os.path.exists(model_path):
-        if not os.path.isdir(model_path):
+    if os.path.exists(base_path):
+        if not os.path.isdir(base_path):
             raise ValueError('There is already a file with this name')
-        elif os.listdir(model_path):
+        elif os.listdir(base_path):
             raise ValueError('The folder is not empty')
 
     # generate it if necessary
     else:
-        os.makedirs(model_path)
+        os.makedirs(base_path)
 
     # generate config
-    create_model_config(name, model_path)
+    create_model_config(name, base_path)
 
     # generate sdf
-    create_landmarks_sdf(input_csv_path, model_path, landmark_models_path)
+    create_landmarks_sdf(input_csv_path, base_path, landmark_models_path)
 
 if __name__ == '__main__':
 
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     )
     parser.add_argument("input_csv_path", type=str, help = "path to landmarks csv file")
     parser.add_argument("output_path", type=str, help = "path where the gazebo model should be generated")
-    parser.add_argument("landmark_models_path", type=str, help = "path where the individual landmark models should be generated")
+    parser.add_argument("landmark_models_path", type=str, help = "folder in which the individual landmark models should be generated")
     parser.add_argument("-n", "--name", type=str, help = "name of the gazebo model", default="landmarks")
     args = parser.parse_args()
 

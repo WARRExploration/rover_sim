@@ -24,20 +24,20 @@ from rover_sim.scripts.landmarks.generate_landmarks import create_landmarks
 from rover_sim.scripts.generate_terrain import generate_terrain
 
 
-def create_world(name,  landmarks_csv, heightmap_csv, random=False):
+def create_world(name,  landmarks, heightmap, random=False):
     """generates a full gazebo model for a ERC landmark
     
     Arguments:
         name {str} -- name of the generated world in rover_sim/worlds
-        landmarks_csv {str} -- path to landmarks csv file
-        heightmap_csv {str} -- path to heightmap csv file (ERC ver2)
+        landmarks {str} -- path to landmarks csv file
+        heightmap {str} -- path to heightmap csv file (ERC ver2)
     TODO is {bool} correct here?
         random {bool} -- create a random heightmap custom to world (default: {False})
     """
 
 
     dirname = op.dirname(__file__)
-    base_path = op.join(dirname, op.pardir, "worlds", args.world)
+    base_path = op.join(dirname, op.pardir, "worlds", name)
     custom_models = op.join(base_path, "models")
 
     world_file = op.join(base_path, "world.world")
@@ -52,15 +52,15 @@ def create_world(name,  landmarks_csv, heightmap_csv, random=False):
     if not op.isdir(custom_models):
         os.makedirs(custom_models)
 
-    if args.landmarks is not None:
-        copyfile(args.landmarks, landmarks_csv)
+    if landmarks is not None:
+        copyfile(landmarks, landmarks_csv)
 
-    if args.heightmap is not None:
-        copyfile(args.heightmap, heightmap_csv)
+    if heightmap is not None:
+        copyfile(heightmap, heightmap_csv)
 
 
     # Terrain and Landmarks generation
-    if args.random:
+    if random:
         subprocess.call(["python", op.join(dirname, "generate_random_heightmap.py"),
                     "--output", heightmap_csv])
 
@@ -123,4 +123,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # generate model
-    create_world(name=args.world, landmarks_csv=args.landmarks, heightmap_csv=args.heightmap, random=args.random)
+    create_world(name=args.world, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random)

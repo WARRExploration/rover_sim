@@ -145,8 +145,8 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
     """generates a whole static gazebo model for a given mesh with texture
     
     Arguments:
-        name {str} -- name of the model, mostly cosmetic
-        output_file_path {str} -- path of the generated model, including name (has to be inside the rover_sim package)
+        name {str} -- name of the model
+        output_file_path {str} -- path to the folder in which the model should be generated, the path will be created
         template_mesh_vis {str} -- path to the template mesh (will be copied)
         template_texture {str} -- path to the texture (will be copied)
     
@@ -157,20 +157,22 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         description {str} -- optional description of the model (default: {None})
     """
 
+    base_path = os.path.join(output_folder, name)
+
     # check if output folder exists (path to it)
-    if os.path.exists(output_folder):
-        if not os.path.isdir(output_folder):
-            raise ValueError('There is already a file with this name: ' + output_folder)
-        elif os.listdir(output_folder):
-            raise ValueError('The folder is not empty: ' + output_folder)
+    if os.path.exists(base_path):
+        if not os.path.isdir(base_path):
+            raise ValueError('There is already a file with this name: ' + base_path)
+        elif os.listdir(base_path):
+            raise ValueError('The folder is not empty: ' + base_path)
 
     # generate it if necessary
     else:
-        os.makedirs(output_folder)
+        os.makedirs(base_path)
 
     # create subfolder
-    os.makedirs(os.path.join(output_folder, 'textures'))
-    os.makedirs(os.path.join(output_folder, 'meshes'))
+    os.makedirs(os.path.join(base_path, 'textures'))
+    os.makedirs(os.path.join(base_path, 'meshes'))
 
     # copy texture
     _, texture_extension = os.path.splitext(template_texture)
@@ -178,32 +180,32 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         raise ValueError('The texture file is missing in the folder ' + template_texture)
 
     relative_texture_path = 'textures/texture' + texture_extension
-    copyfile(template_texture, os.path.join(output_folder, relative_texture_path))
+    copyfile(template_texture, os.path.join(base_path, relative_texture_path))
 
 
     # replace the texturepath in the template
     replace_texture_path_on_template(
         template_file_path= template_mesh_vis,
-        output_file_path= os.path.join(output_folder, 'meshes/mesh.dae'),
+        output_file_path= os.path.join(base_path, 'meshes/mesh.dae'),
         new_texture_relative_path= os.path.join('..',relative_texture_path)
     )
 
     if template_mesh_col:
         replace_texture_path_on_template(
             template_file_path= template_mesh_col,
-            output_file_path= os.path.join(output_folder, 'meshes/collision_mesh.dae'),
+            output_file_path= os.path.join(base_path, 'meshes/collision_mesh.dae'),
             new_texture_relative_path= os.path.join('..',relative_texture_path)
         )
 
     create_model_config(
         name,  
-        output_file_path= output_folder,
+        output_file_path= base_path,
         description=description
     )
 
     rospack = RosPack()
     rover_sim_dir = rospack.get_path('rover_sim')
-    relative_path = os.path.relpath(output_folder, rover_sim_dir)
+    relative_path = os.path.relpath(base_path, rover_sim_dir)
 
     mesh_vis_path = 'model://rover_sim/' + relative_path + '/meshes/mesh.dae'
 
@@ -217,7 +219,7 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         model_file_path= mesh_vis_path,
         pose= pose,
         size= size,
-        output_file_path=output_folder,
+        output_file_path=base_path,
         collision_model_file_path=mesh_col_path
     )
 
@@ -242,9 +244,9 @@ if __name__ == '__main__':
     parser.add_argument("template", type=str, help="path to the mesh template")
     parser.add_argument("texture", type=str, help="path to the texture which should be mapped on the mesh (texture will be copied)")
     parser.add_argument("-c", "--collision", type=str, help="path to the collisin mesh template")
-    parser.add_argument("-o", "--output", type=str, help="path to the folder where the model should be generated, the path will be created", default=output_folder)
+    parser.add_argument("-o", "--output", type=str, help="path to the folder in which the model should be generated, the path will be created", default=output_folder)
     parser.add_argument("-p", "--pose", type=float, help="position and rotation of the model", default=[0, 0, 0, 0, 0, 0], nargs=6)
-    parser.add_argument("-s", "--size", type=str, help="path to the folder where the model should be generated, the path will be created", default=[1, 1, 1], nargs=3)
+    parser.add_argument("-s", "--size", type=str, help="scale of the model", default=[1, 1, 1], nargs=3)
     parser.add_argument("-d", "--description", type=str, help="small description of the model")
     args = parser.parse_args()
 
