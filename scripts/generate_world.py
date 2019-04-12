@@ -25,7 +25,7 @@ from rover_sim.scripts.generate_terrain import generate_terrain
 from rover_sim.scripts.generate_random_heightmap import create_random_heightmap
 
 
-def create_world(name, template_dir, landmarks, heightmap, random=False):
+def create_world(name, template_dir, landmarks, heightmap, random=False, force=False):
     """generates a full gazebo model for a ERC landmark
     
     Arguments:
@@ -34,12 +34,14 @@ def create_world(name, template_dir, landmarks, heightmap, random=False):
         landmarks {str} -- path to landmarks csv file
         heightmap {str} -- path to heightmap csv file (ERC ver2)
         random {bool} -- create a random heightmap custom to world (default: {False})
+        force {bool} -- delete old generated world files (default: {False})
     """
 
 
     dirname = op.dirname(__file__)
     base_path = op.join(dirname, op.pardir, "worlds", name)
     custom_models = op.join(base_path, "models")
+    backup_models = custom_models + ".backup"
 
     world_name = "world"
     terran_name = "terrain"
@@ -55,6 +57,16 @@ def create_world(name, template_dir, landmarks, heightmap, random=False):
     if not op.isdir(base_path):
         os.makedirs(base_path)
 
+    if force:
+        if op.exists(world_file):
+            print("Removing old world file at " + world_file)
+            os.remove(world_file)
+        if op.isdir(custom_models):
+            print("Removing old models folder at " + custom_models)
+            shutil.rmtree(custom_models)
+        if op.isdir(backup_models):
+            print("Removing old models backup folder at " + backup_models)
+            shutil.rmtree(backup_models)
     
 
     ## Create or pull in Resources
@@ -100,12 +112,11 @@ def create_world(name, template_dir, landmarks, heightmap, random=False):
         if not os.path.isdir(custom_models):
             raise ValueError("'models' has to be a directory, found file at " + custom_models)
         else:
-            backup = custom_models + ".backup"
-            if os.path.exists(backup):
+            if os.path.exists(backup_models):
                 print("Removing the old backup folder")
-                shutil.rmtree(backup)
-            print("Copying old 'models' folder to backup at " + backup + "\n")
-            os.rename(custom_models, backup)
+                shutil.rmtree(backup_models)
+            print("Copying old 'models' folder to backup at " + backup_models + "\n")
+            os.rename(custom_models, backup_models)
     
     os.mkdir(custom_models)
 
@@ -151,6 +162,11 @@ def create_world(name, template_dir, landmarks, heightmap, random=False):
         uri.text = "model://all_landmarks"
         world.append(include_landmarks)
 
+        include_names = etree.Element("include")
+        uri = etree.SubElement(include_names,"uri")
+        uri.text = "model://names/all_names"
+        world.append(include_names)
+
 
         #print(etree.tostring(worl_file, pretty_print=True, encoding='utf8', xml_declaration=True))
         tree.write(world_file, pretty_print=True, encoding='utf8', xml_declaration=True)
@@ -168,11 +184,12 @@ if __name__ == '__main__':
 
     parser.add_argument("-w", "--world", type=str, help = "World name, updates world if already exists", nargs="?", default="Generated")
     parser.add_argument("-t", "--template", type=str, help = "Template folder with correctly named Resources for generation.\n"
-                                                            + "Overridden by individual resource arguments like '-l'. Use this to create world with same settings as old one")
+                                                            + "Overridden by individual resource arguments like '-l'. Use this to create world with same settings as an old one")
     parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file")
     parser.add_argument("-m", "--heightmap", type=str, help = "Path to heightmap csv file (ERC ver2)")
     parser.add_argument("-r", "--random", action="store_true", help = "Random heightmap and landmarks")
+    parser.add_argument("-f", "--force", action="store_true", help = "Force overwrite of generated world")
     args = parser.parse_args()
 
     # generate model
-    create_world(name=args.world, template_dir=args.template, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random)
+    create_world(name=args.world, template_dir=args.template, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random, force=args.force)
