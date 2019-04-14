@@ -5,27 +5,27 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0</authoring_tool>
     </contributor>
-    <created>2019-03-29T16:13:49</created>
-    <modified>2019-03-29T16:13:49</modified>
+    <created>2019-04-14T21:33:53</created>
+    <modified>2019-04-14T21:33:53</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
   <library_images>
-    <image id="texture_default" name="texture_default">
-      <init_from>texture_default.png</init_from>
+    <image id="texture" name="texture">
+      <init_from>texture.png</init_from>
     </image>
   </library_images>
   <library_effects>
     <effect id="Material_001-effect">
       <profile_COMMON>
-        <newparam sid="texture_default-surface">
+        <newparam sid="texture-surface">
           <surface type="2D">
-            <init_from>texture_default</init_from>
+            <init_from>texture</init_from>
           </surface>
         </newparam>
-        <newparam sid="texture_default-sampler">
+        <newparam sid="texture-sampler">
           <sampler2D>
-            <source>texture_default-surface</source>
+            <source>texture-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -37,7 +37,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="texture_default-sampler"/>
+              <texture texture="texture-sampler"/>
             </diffuse>
             <specular>
               <color sid="specular">0.5 0.5 0.5 1</color>

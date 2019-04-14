@@ -41,7 +41,9 @@ def create_single_landmark(name, number, output_folder, pose=[0, 0, 0, 0, 0, 0])
         template_texture=temp_texture_path,
         pose=pose, size=size, 
         template_mesh_col=template_col,
-        description="Landmark for the ERC"
+        description="Landmark for the ERC",
+        static=True, 
+        ghost=False
     )
 
     # remove temporary texture

@@ -62,7 +62,7 @@ def create_model_config(name, output_file_path, description=None):
     tree.write(os.path.join(output_file_path, 'model.config'), pretty_print=True, encoding='utf8', xml_declaration=True)
 
 
-def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], collision_model_file_path=None):
+def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], collision_model_file_path=None, static=True, ghost=False):
     """generates the sdf file for a gazebo model (model will be static)
     
     Arguments:
@@ -74,6 +74,8 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
         pose {list} -- static pose of the model (default: {[0, 0, 0, 0, 0, 0]})
         size {list} -- size of the model (default: {[1, 1, 1]})
         collision_model_file_path {str} -- optional path to the collision model in sdf format (default: {None}, the normal model will be used as collision model instead)
+        static {bool} -- model does not move (default: {True})
+        ghost {bool} -- model has no collision (default: {False})
     """
     sdf = etree.Element('sdf')
     sdf.set('version', '1.6')
@@ -84,8 +86,9 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     pose_node = etree.Element('pose')
     pose_node.text = ' '.join(map(str, pose))
 
-    static = etree.Element('static')
-    static.text = 'true'
+    if static:
+        static_node = etree.Element('static')
+        static_node.text = 'true'
 
     link = etree.Element('link')
     link.set('name', 'link')
@@ -106,32 +109,34 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
     visual_mesh.append(visual_scale)
     visual_geometry.append(visual_mesh)
     visual.append(visual_geometry)
+    link.append(visual)
 
     # collision
-    collision = etree.Element('collision')
-    collision.set('name', 'collision')
-    collision_geometry = etree.Element('geometry')
+    if not ghost:
+        collision = etree.Element('collision')
+        collision.set('name', 'collision')
+        collision_geometry = etree.Element('geometry')
 
-    collision_mesh = etree.Element('mesh')
-    collision_uri = etree.Element('uri')
-    # use the same model for collision if there is no extra collision model
-    collision_uri.text = collision_model_file_path if collision_model_file_path else model_file_path
-    
-    collision_scale = etree.Element('scale')
-    collision_scale.text = ' '.join(map(str, size))
+        collision_mesh = etree.Element('mesh')
+        collision_uri = etree.Element('uri')
+        # use the same model for collision if there is no extra collision model
+        collision_uri.text = collision_model_file_path if collision_model_file_path else model_file_path
+        
+        collision_scale = etree.Element('scale')
+        collision_scale.text = ' '.join(map(str, size))
 
-    collision_mesh.append(collision_uri)
-    collision_mesh.append(collision_scale)
-    collision_geometry.append(collision_mesh)
-    collision.append(collision_geometry)
+        collision_mesh.append(collision_uri)
+        collision_mesh.append(collision_scale)
+        collision_geometry.append(collision_mesh)
+        collision.append(collision_geometry)
+        link.append(collision)
 
-    link.append(visual)
-    link.append(collision)
     
     model.append(link)
     
     model.append(pose_node)
-    model.append(static)
+    if static: 
+        model.append(static_node)
     model.append(link)
 
     sdf.append(model)
@@ -141,8 +146,8 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
 
 
 def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture, 
-        pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_mesh_col=None, description=None):
-    """generates a whole static gazebo model for a given mesh with texture
+        pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_mesh_col=None, description=None, static=True, ghost=False):
+    """generates a whole gazebo model for a given mesh with texture
     
     Arguments:
         name {str} -- name of the model
@@ -151,10 +156,12 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         template_texture {str} -- path to the texture (will be copied)
     
     Keyword Arguments:
-        pose {list} -- static pose of the model (default: {[0, 0, 0, 0, 0, 0]})
+        pose {list} -- position and rotation of the model (default: {[0, 0, 0, 0, 0, 0]})
         size {list} -- size of the model (default: {[1, 1, 1]})
         template_mesh_col {str} -- optional path to a template collision mesh (will be copied) (default: {None})
         description {str} -- optional description of the model (default: {None})
+        static {bool} -- model does not move (default: {True})
+        ghost {bool} -- model has no collision (default: {False})
     """
 
     base_path = os.path.join(output_folder, name)
@@ -223,7 +230,9 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         pose= pose,
         size= size,
         output_file_path=base_path,
-        collision_model_file_path=mesh_col_path
+        collision_model_file_path=mesh_col_path,
+        static= static,
+        ghost= ghost
     )
 
 if __name__ == '__main__':
@@ -246,11 +255,13 @@ if __name__ == '__main__':
     parser.add_argument("name", type=str, help="name of the gazebo model file")
     parser.add_argument("template", type=str, help="path to the mesh template")
     parser.add_argument("texture", type=str, help="path to the texture which should be mapped on the mesh (texture will be copied)")
-    parser.add_argument("-c", "--collision", type=str, help="path to the collisin mesh template")
+    parser.add_argument("-c", "--collision", type=str, help="path to the collision mesh template")
     parser.add_argument("-o", "--output", type=str, help="path to the folder in which the model should be generated, the path will be created", default=output_folder)
     parser.add_argument("-p", "--pose", type=float, help="position and rotation of the model", default=[0, 0, 0, 0, 0, 0], nargs=6)
     parser.add_argument("-s", "--size", type=str, help="scale of the model", default=[1, 1, 1], nargs=3)
     parser.add_argument("-d", "--description", type=str, help="small description of the model")
+    parser.add_argument("-m", "--movable", action="store_true", help = "model can fall down")
+    parser.add_argument("-g", "--ghost", action="store_true", help = "model has no collision")
     args = parser.parse_args()
 
     # generate model
@@ -262,5 +273,7 @@ if __name__ == '__main__':
         pose=args.pose,
         size=args.size,
         template_mesh_col=args.collision,
-        description=args.description
+        description=args.description,
+        static=(not args.movable), 
+        ghost=args.ghost
     )
