@@ -25,7 +25,7 @@ from rover_sim.scripts.generate_terrain import generate_terrain
 from rover_sim.scripts.generate_random_heightmap import create_random_heightmap
 
 
-def create_world(name, template_dir, landmarks, heightmap, random=False, force=False):
+def create_world(name, template_dir, landmarks, heightmap, random=False, force=False, no_landmarks=False):
     """generates a full gazebo model for a ERC landmark
     
     Arguments:
@@ -34,7 +34,8 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
         landmarks {str} -- path to landmarks csv file
         heightmap {str} -- path to heightmap csv file (ERC ver2)
         random {bool} -- create a random heightmap custom to world (default: {False})
-        force {bool} -- delete old generated world files (default: {False})
+        force {bool} -- delete old world file (default: {False})
+        no_landmarks {bool} -- don't include landmarks (default: {False})
     """
 
 
@@ -61,13 +62,8 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
         if op.exists(world_file):
             print("Removing old world file at " + world_file)
             os.remove(world_file)
-        if op.isdir(custom_models):
-            print("Removing old models folder at " + custom_models)
-            shutil.rmtree(custom_models)
-        if op.isdir(backup_models):
-            print("Removing old models backup folder at " + backup_models)
-            shutil.rmtree(backup_models)
     
+
 
     ## Create or pull in Resources
 
@@ -79,7 +75,7 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
     #TODO add generate_random_landmarks.py once the script is ready
 
 
-    if template_dir is not None:
+    if template_dir is not None: 
         template_land = op.join(template_dir, landmarks_name + ".csv")
         if op.exists(template_land):
             shutil.copyfile(template_land, landmarks_csv)
@@ -97,12 +93,14 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
 
 
     if not os.path.exists(heightmap_csv):
-        raise ValueError(" heightmap file needed at " + heightmap_csv 
+        raise ValueError("Heightmap file needed at " + heightmap_csv 
                         + "\nProvide one manually or run generate_world with 'random' flag")
     
     if not os.path.exists(landmarks_csv):
-        raise ValueError("landmark file needed at " + landmarks_csv 
-                        + "\nProvide one manually or run generate_world with 'random' flag")
+        if not no_landmarks:
+            print("Landmarks file not found at " + landmarks_csv)
+            no_landmarks = True
+        print("Creating world without landmarks\n")
 
         
 
@@ -113,7 +111,7 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
             raise ValueError("'models' has to be a directory, found file at " + custom_models)
         else:
             if os.path.exists(backup_models):
-                print("Removing the old backup folder")
+                print("Removing old models backup folder")
                 shutil.rmtree(backup_models)
             print("Copying old 'models' folder to backup at " + backup_models + "\n")
             os.rename(custom_models, backup_models)
@@ -123,8 +121,8 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
 
     generate_terrain(name=terran_name, csv_file_path=heightmap_csv, output_folder=custom_models)
 
-                                                                                                                             # ↓TODO
-    create_landmarks(name=all_landmarks, input_csv_path=landmarks_csv, output_path=custom_models, landmark_models_path="/tmp/not_used_yet_TODO")
+    if not no_landmarks:                                                                                                         # ↓TODO
+        create_landmarks(name=all_landmarks, input_csv_path=landmarks_csv, output_path=custom_models, landmark_models_path="/tmp/not_used_yet_TODO")
 
 
 
@@ -151,16 +149,16 @@ def create_world(name, template_dir, landmarks, heightmap, random=False, force=F
         uri.text = "model://sun"
         world.append(include_sun)
 
-
         include_terrain = etree.Element("include")
         uri = etree.SubElement(include_terrain,"uri")
         uri.text = "model://terrain"
         world.append(include_terrain)
 
-        include_landmarks = etree.Element("include")
-        uri = etree.SubElement(include_landmarks,"uri")
-        uri.text = "model://all_landmarks"
-        world.append(include_landmarks)
+        if not no_landmarks:
+            include_landmarks = etree.Element("include")
+            uri = etree.SubElement(include_landmarks,"uri")
+            uri.text = "model://all_landmarks"
+            world.append(include_landmarks)
 
         include_names = etree.Element("include")
         uri = etree.SubElement(include_names,"uri")
@@ -188,8 +186,10 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--landmarks", type=str, help = "Path to landmarks csv file")
     parser.add_argument("-m", "--heightmap", type=str, help = "Path to heightmap csv file (ERC ver2)")
     parser.add_argument("-r", "--random", action="store_true", help = "Random heightmap and landmarks")
-    parser.add_argument("-f", "--force", action="store_true", help = "Force overwrite of generated world")
+    parser.add_argument("-f", "--force", action="store_true", help = "Force overwrite of old world file")
+    parser.add_argument("-n", "--no_landmarks", action="store_true", help = "Don't include landmarks")
     args = parser.parse_args()
 
     # generate model
-    create_world(name=args.world, template_dir=args.template, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random, force=args.force)
+    create_world(name=args.world, template_dir=args.template, landmarks=args.landmarks, heightmap=args.heightmap, random=args.random, force=args.force, no_landmarks=args.no_landmarks)
+    

@@ -31,5 +31,7 @@
         <param name="scale_linear_turbo" value="2"/>
         <param name="scale_angular" value="2"/>
     </node>
+    
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop" output="screen"/>
 
 </launch>
