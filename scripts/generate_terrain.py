@@ -49,8 +49,8 @@ def get_coordinates_from_csv(csv_file_path):
             if i != 1:
                 continue
 
-            # we are only interested in the spacing
-            _, _, spacing_y, spacing_x, _, _ = np.fromstring(
+            # we are only interested in the spacing and coords_0
+            _, _, spacing_y, spacing_x, x_0, y_0 = np.fromstring(
                 line, dtype=float, sep=' ')
             break
 
@@ -60,18 +60,25 @@ def get_coordinates_from_csv(csv_file_path):
     # flip the matrix around the x-axis to be able to index it the right way
     data = np.moveaxis(np.flip(data, 0), 0, -1)
 
+    # apply threshold (set invalid values to 0)
+    data[data >= 2.8] = 0
+
     # get dimensions of the matrix
     number_of_cols, number_of_rows = data.shape
 
     # x-Axis
     # generate vector
     xs = np.mgrid[:number_of_cols] * spacing_x
+    # add possible offset
+    xs += x_0
     # generate grid from vector
     xs = np.stack((xs,) * number_of_rows, axis=-1)
 
     # y-Axis
     # generate vector
     ys = np.mgrid[:number_of_rows] * spacing_y
+    # add possible offset
+    ys += y_0 - number_of_rows*spacing_y
     # generate grid from vector
     ys = np.stack((ys,) * number_of_cols, axis=0)
 
@@ -304,7 +311,7 @@ if __name__ == '__main__':
     
     # default values
     csv_file_path = os.path.join(
-        rover_sim_dir, 'providedFiles/erc2018/DTM_ver2.csv')
+        rover_sim_dir, 'providedFiles/erc2018final/DTM01_v2.txt')
     output_folder = os.path.join(rover_sim_dir, 'models/terrain')
     terrain_name = 'terrain'
 
