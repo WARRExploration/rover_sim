@@ -10,8 +10,16 @@
     <arg name="world" default="Generated"/>
 
     <arg name="world_path" value="$(find rover_sim)/worlds/$(arg world)"/>
+    <arg name="world_yaml_path" value="$(arg world_path)/start.yaml"/>
 
-    <rosparam command="load" file="$(arg world_path)/start.yaml"/>
+    <rosparam command="load" file="$(find rover_sim)/launch/default.start.yaml"/>
+    
+<!--     <rosparam command="load" file="$(arg world_path)/start.yaml" if="$(eval map(lambda x: execfile(x),['aaaaaaaaaa', 'b']))"/> -->
+<!--     <rosparam command="load" file="$(arg world_path)/start.yaml" if="$(eval             map(lambda x: apply(x[0],x[1]),       zip([lambda x: x + 1, lambda x: execfile(x)],['aaaaaaaaaa', 'b'])   )   )"/> -->
+<!--     <rosparam command="load" file="$(arg world_path)/start.yaml" if="$(eval             map(lambda x: apply(x[0], [x[1]]),       zip([lambda x: x + 1, lambda x: x + 5],[3, 3])   )   )"/> -->
+<!--      <rosparam command="load" file="$(arg world_path)/start.yaml" if="$(eval dir('_' + '_builtins_' + '_'))"/> -->
+     <rosparam command="load" file="$(arg world_path)/start.yaml" 
+            if="$(eval eval('_' + '_import_' + '_(\'os\').path.isfile(\''  +   arg('world_yaml_path')   + '\')'     ))"/>
 
 
     <!-- Declare model path specific to selected world -->

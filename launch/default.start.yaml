@@ -1,0 +1,5 @@
+# These are the default starting coordinates of the rover
+# if the world doesn't have a start.yaml file
+start_x: 0
+start_y: 0
+start_z: 2.00
