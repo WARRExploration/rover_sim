@@ -1,0 +1,8 @@
+Digital Terrain Model
+
+file          | resolution | format
+-------------------------------------------
+DTM05_v1.txt  | 0.5m       | list of points 
+DTM05_v2.txt  | 0.5m       | matrix
+DTM01_v1.txt  |	0.1m       | list of points 
+DTM01_v2.txt  | 0.1m       | matrix

@@ -5,39 +5,39 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0</authoring_tool>
     </contributor>
-    <created>2019-03-29T11:07:10</created>
-    <modified>2019-03-29T11:07:10</modified>
+    <created>2019-04-11T23:50:02</created>
+    <modified>2019-04-11T23:50:02</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
   <library_images>
-    <image id="texture_marker_png" name="texture_marker_png">
-      <init_from>texture_marker.png</init_from>
+    <image id="texture_png" name="texture_png">
+      <init_from>texture.png</init_from>
     </image>
   </library_images>
   <library_effects>
     <effect id="texture-effect">
       <profile_COMMON>
-        <newparam sid="texture_marker_png-surface">
+        <newparam sid="texture_png-surface">
           <surface type="2D">
-            <init_from>texture_marker_png</init_from>
+            <init_from>texture_png</init_from>
           </surface>
         </newparam>
-        <newparam sid="texture_marker_png-sampler">
+        <newparam sid="texture_png-sampler">
           <sampler2D>
-            <source>texture_marker_png-surface</source>
+            <source>texture_png-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0.3 0.3 0.3 1</color>
+              <color sid="emission">0.6 0.6 0.6 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="texture_marker_png-sampler"/>
+              <texture texture="texture_png-sampler"/>
             </diffuse>
             <specular>
               <color sid="specular">0.5 0.5 0.5 1</color>
@@ -57,7 +57,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0.3 0.3 0.3 1</color>
+              <color sid="emission">0.6 0.6 0.6 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0 0 0 1</color>

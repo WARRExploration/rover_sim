@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF8'?>
+<sdf version="1.6">
+  <model name="all_names">
+    <model name="Logo">
+      <include>
+        <uri>model://names/Logo</uri>
+        <pose>10 10 -10 0 0 0</pose>
+      </include>
+    </model>
+<!-- suitable poses:
+10 10 -10 0 0 0
+10 7.5 -13 0 0 0
+10 7.5 -16 0 0 0
+10 12.5 -13 0 0 0
+-->
+  </model>
+</sdf>

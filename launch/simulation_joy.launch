@@ -1,9 +1,11 @@
 <launch>
     <arg name="model" default="$(find rover_config)/urdf/rover.xacro"/>
-    <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+    <arg name="rvizconfig" default="$(find rover_config)/rviz/qr_detection.rviz" />
+    <arg name="world" default="Generated"/>
 
     <include file="$(find rover_sim)/launch/gazebo.launch">
         <arg name="model" value="$(arg model)" />
+        <arg name="world" value="$(arg world)"/>
     </include>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
@@ -17,6 +19,7 @@
 
     <remap from="/cmd_vel" to="/rover_diff_drive_controller/cmd_vel"/>
 
+
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" />
 
     <node name="joy" pkg="joy" type="joy_node" output="screen">
@@ -29,5 +32,11 @@
         <param name="scale_linear_turbo" value="2"/>
         <param name="scale_angular" value="2"/>
     </node>
+    
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop" output="screen"/>
+
+    <!-- launch qr detection -->
+    <include file="$(find qr_detection)/launch/detect_individual_ar_tags.launch">
+    </include>
 
 </launch>

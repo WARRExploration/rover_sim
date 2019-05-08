@@ -1,6 +1,6 @@
 <launch>
 
-    <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+    <!-- these are the arguments you can pass this launch file, for example  paused:=true  or  world:=erc2018 -->
     <arg name="paused" default="false"/>
     <arg name="use_sim_time" default="true"/>
     <arg name="gui" default="true"/>
@@ -8,14 +8,25 @@
     <arg name="debug" default="false"/>
     <arg name="model" default="$(find rover_config)/urdf/rover.xacro"/>
     <arg name="world" default="Generated"/>
+
+    <arg name="world_path" value="$(find rover_sim)/worlds/$(arg world)"/>
+    <arg name="world_yaml_path" value="$(arg world_path)/start.yaml"/>
+
+    <rosparam command="load" file="$(find rover_sim)/launch/default.start.yaml"/>
     
+    <!-- We abuse the $(eval) statement to allow importing the os.path module, -->
+    <!-- and only load the world's start.yaml file if it exists -->
+    <rosparam command="load" file="$(arg world_yaml_path)" 
+            if="$(eval eval( '_'+'_import_'+'_(\'os\').path.isfile(\'' + arg('world_yaml_path') + '\')' ))"/>
+
+
     <!-- Declare model path specific to selected world -->
     <!-- models in e.g. worlds/Generated/models override ones in models/ -->
-    <env name="GAZEBO_MODEL_PATH" value="$(find rover_sim)/worlds/$(arg world)/models:$(find rover_sim)/models:$(optenv GAZEBO_MODEL_PATH)" />
+    <env name="GAZEBO_MODEL_PATH" value="$(arg world_path)/models:$(find rover_sim)/models:$(optenv GAZEBO_MODEL_PATH)" />
 
     <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find rover_sim)/worlds/$(arg world)/world.world"/>
+        <arg name="world_name" value="$(arg world_path)/world.world"/>
         <arg name="debug" value="$(arg debug)" />
         <arg name="gui" value="$(arg gui)" />
         <arg name="paused" value="$(arg paused)"/>
@@ -26,7 +37,7 @@
     <param name="robot_description" command="xacro '$(arg model)'" />
 
     <!-- push robot_description to factory and spawn robot in gazebo -->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" args="-x 17.70 -y 1.50 -z 1.5 -unpause -urdf -model rover_model -param robot_description" respawn="false" output="screen" />
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" launch-prefix="/bin/bash -c '$* -x `rosparam get start_x` -y `rosparam get start_y` -z `rosparam get start_z` -unpause -urdf -model rover_model -param robot_description' --" respawn="false" output="screen" />
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
         <param name="publish_frequency" type="double" value="30.0" />

@@ -4,11 +4,18 @@ generate the the texure and the mesh of a ERC terrain in a specified folder
 """
 
 
-from collada import *
+from collada import source, geometry, material, scene, Collada
 import numpy as np
-import os
-from rospkg import RosPack
+import os, sys
 from shutil import copyfile
+from rospkg import RosPack
+
+# import relative to rover_sim
+rospack = RosPack()
+rover_sim_dir = rospack.get_path('rover_sim')
+sys.path.append(os.path.dirname(rover_sim_dir))
+
+from rover_sim.scripts.generate_gazebo_model import create_gazebo_model
 
 
 def id(x, y, number_of_rows):
@@ -42,8 +49,8 @@ def get_coordinates_from_csv(csv_file_path):
             if i != 1:
                 continue
 
-            # we are only interested in the spacing
-            _, _, spacing_y, spacing_x, _, _ = np.fromstring(
+            # we are only interested in the spacing and coords_0
+            _, _, spacing_y, spacing_x, x_0, y_0 = np.fromstring(
                 line, dtype=float, sep=' ')
             break
 
@@ -53,18 +60,25 @@ def get_coordinates_from_csv(csv_file_path):
     # flip the matrix around the x-axis to be able to index it the right way
     data = np.moveaxis(np.flip(data, 0), 0, -1)
 
+    # apply threshold (set invalid values to 0)
+    data[data >= 2.8] = 0
+
     # get dimensions of the matrix
     number_of_cols, number_of_rows = data.shape
 
     # x-Axis
     # generate vector
     xs = np.mgrid[:number_of_cols] * spacing_x
+    # add possible offset
+    xs += x_0
     # generate grid from vector
     xs = np.stack((xs,) * number_of_rows, axis=-1)
 
     # y-Axis
     # generate vector
     ys = np.mgrid[:number_of_rows] * spacing_y
+    # add possible offset
+    ys += y_0 - number_of_rows*spacing_y
     # generate grid from vector
     ys = np.stack((ys,) * number_of_cols, axis=0)
 
@@ -251,68 +265,65 @@ def generate_collada(coords, relative_texture_path):
     return mesh
 
 
-def generate_terrain(csv_file_path, output_folder, terrain_name):
-    """generate the the texure and the mesh of a ERC terrain in a specified folder
+def generate_terrain(name, csv_file_path, output_folder):
+    """generate the texture and the mesh of a ERC terrain in a specified folder
 
     Arguments:
+        name {str} -- name of the generated terrain model
         csv_file_path {str} -- path to the ERC csv file (ver2)
-        output_folder {str} -- path to the folder where the files should be generated, the path will be created, folder has to be empty
-        terrain_name {str} -- name of the terrain collada file
+        output_folder {str} -- path to the folder in which the model will be generated
     """
-
-    # check if output folder exists (path to it)
-    if os.path.exists(output_folder):
-        if not os.path.isdir(output_folder):
-            raise ValueError('There is already a file with this name')
-        elif os.listdir(output_folder):
-            raise ValueError('The folder is not empty')
-
-    # generate it if necessary
-    else:
-        os.makedirs(output_folder)
 
     # read coordinates
     coords = get_coordinates_from_csv(csv_file_path)
 
     # TODO: generate texture (currently only copy of resources)
-    rospack = RosPack()
-    rover_sim_dir = rospack.get_path('rover_sim')
     texture_path = os.path.join(rover_sim_dir, 'resources/terrain/sand_texture.png')
     _, extension = os.path.splitext(texture_path)
     if not os.path.exists(texture_path):
         raise ValueError('The texture file is missing in the folder ' + texture_path)
 
     relative_texture_path = 'texture' + extension
-    copyfile(texture_path, os.path.join(output_folder, relative_texture_path))
+
+
+    temp_mesh = '/tmp/terrain_temp.dae'
 
     # generate mesh
     mesh = generate_collada(coords, relative_texture_path)
     # save collada to file
-    mesh.write(os.path.join(output_folder, terrain_name + '.dae'))
+    mesh.write(temp_mesh)
+
+    # gazebo model
+    create_gazebo_model(
+        name=name, 
+        output_folder=output_folder, 
+        template_mesh_vis=temp_mesh, 
+        template_texture=texture_path,
+        description="Terrain heightmap"
+    )
+
+    os.remove(temp_mesh)
 
 
 if __name__ == '__main__':
 
-    from argparse import ArgumentParser
-
-    rospack = RosPack()
-
-    # get path of package
-    rover_sim_dir = rospack.get_path('rover_sim')
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     
     # default values
     csv_file_path = os.path.join(
-        rover_sim_dir, 'providedFiles/erc2018/DTM_ver2.csv')
+        rover_sim_dir, 'providedFiles/erc2018final/DTM01_v2.txt')
     output_folder = os.path.join(rover_sim_dir, 'models/terrain')
     terrain_name = 'terrain'
 
     # parse command line arguments
     parser = ArgumentParser(
-        description="generate the the texure and the mesh of a ERC terrain in a specified folder")
+        description="generate a gazebo model with texture and mesh of a ERC terrain in a specified folder",
+        formatter_class=ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument("-i", "--input", type=str, help="path to the ERC csv file (ver2)", default=csv_file_path)
-    parser.add_argument("-o", "--output", type=str, help="path to the folder where the files should be generated, the path will be created", default=output_folder)
+    parser.add_argument("-o", "--output", type=str, help="path to the folder in which the model will be generated", default=output_folder)
     parser.add_argument("-n", "--name", type=str, help="name of the terrain collada file", default=terrain_name)
     args = parser.parse_args()
 
     # generate terrain
-    generate_terrain(args.input, args.output, args.name)
+    generate_terrain(name=args.name, csv_file_path=args.input, output_folder=args.output)

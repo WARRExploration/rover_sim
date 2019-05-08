@@ -7,7 +7,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://rover_sim/models/landmarks/L9/meshes/marker9.dae</uri>
+            <uri>model://rover_sim/models/landmarks/L9/meshes/mesh.dae</uri>
             <scale>0.21 0.21 0.297</scale>
           </mesh>
         </geometry>
@@ -15,7 +15,7 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://rover_sim/models/landmarks/L9/meshes/marker_coll.dae</uri>
+            <uri>model://rover_sim/models/landmarks/L9/meshes/collision_mesh.dae</uri>
             <scale>0.21 0.21 0.297</scale>
           </mesh>
         </geometry>
