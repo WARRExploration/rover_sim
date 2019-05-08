@@ -29,9 +29,9 @@ def world_build(world_path=None, force=False):
         'Landmarks.csv':  position list of the landmarks
     
     Arguments:
-        world_path {str} -- path to the directory in which the world will be generated,
+        world_path {str} -- path to the directory where the world will be generated,
                             if empty: use current path of the shell (default: {None})
-        force {bool} -- delete old world file (default: {False})
+        force {bool} -- delete old .world file (default: {False})
     """
 
     if world_path is None:
@@ -46,12 +46,12 @@ def world_build(world_path=None, force=False):
     all_landmarks_name = "all_landmarks"
 
     world_file = op.join(base_path,"world.world")
-    landmarks_csv = op.join(base_path, "Lanmarks.csv")
+    landmarks_csv = op.join(base_path, "Landmarks.csv")
     heightmap_csv = op.join(base_path, "Heightmap.csv")
 
 
     if not op.samefile(op.split(base_path)[0], op.join(rover_sim_dir, "worlds")):
-        print("The world will be generated in " + base_path)
+        print("The world will be generated at " + base_path)
         if "y" != raw_input("This is not the standard location inside the 'worlds' directory.\n"
                 + "Are you sure? Type y to continue\n").lower():
             raise KeyboardInterrupt("Cancelled by user")
@@ -89,20 +89,22 @@ def world_build(world_path=None, force=False):
         no_landmarks = True
 
 
-
     ## Generate the Models from the Resources
-
 
     if not no_terrain:
         generate_terrain(name=terran_name, csv_file_path=heightmap_csv, output_folder=custom_models)
-
+    
     if not no_landmarks:                                                                                                         # ↓TODO
         create_landmarks(name=all_landmarks_name, input_csv_path=landmarks_csv, output_path=custom_models, landmark_models_path="/tmp/not_used_yet_TODO")
 
-
+    try:
+        os.rmdir( custom_models )
+        print("Removing empty models directory at " + custom_models + "\n")
+    except OSError:
+        pass
+    
 
     ## Create .world file
-
 
     if force:
         if op.exists(world_file):
@@ -156,14 +158,14 @@ def world_build(world_path=None, force=False):
 
 if __name__ == '__main__':
 
-    from argparse import ArgumentParser, RawDescriptionHelpFormatter#ArgumentDefaultsHelpFormatter
+    from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
     # parse command line arguments
     parser = ArgumentParser(
         description="Builds the world from files in the specified folder. The following files should be present:\n"
                 + "  'Heightmap.csv':  heightmap csv file (ERC ver2)\n"
                 + "  'Landmarks.csv':  position list of the landmarks""",
-        formatter_class=RawDescriptionHelpFormatter#ArgumentDefaultsHelpFormatter     
+        formatter_class=RawDescriptionHelpFormatter
     )
 
     parser.add_argument("world", type=str, help = "Path to the world directory, if empty: use shell working dir" , nargs="?", default=None)

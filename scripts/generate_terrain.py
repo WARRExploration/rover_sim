@@ -213,8 +213,13 @@ def generate_collada(coords, relative_texture_path):
     # create source arrays
     vert_src = source.FloatSource(
         'verts-array', generate_vertex_array(coords), ('X', 'Y', 'Z'))
+
+    # TODO Why does the following line stop the script?!
+    print("yay i'm called")
     normal_src = source.FloatSource(
         'normals-array', generate_normal_array(coords), ('X', 'Y', 'Z'))
+    print("oh no i'm not")
+    
     uv_src = source.FloatSource(
         'uv-array', generate_uv_array(coords), ('S', 'T'))
 
