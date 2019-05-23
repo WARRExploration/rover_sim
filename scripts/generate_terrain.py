@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-generate the the texure and the mesh of a ERC terrain in a specified folder
+generate the texure and the mesh of a ERC terrain in a specified folder
 """
 
 
