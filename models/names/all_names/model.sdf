@@ -7,6 +7,13 @@
         <pose>10 10 -10 0 0 0</pose>
       </include>
     </model>
+
+    <model name="Markus">
+      <include>
+        <uri>model://names/Markus</uri>
+        <pose>10 7.5 -13 0 0 0</pose>
+      </include>
+    </model>
 <!-- suitable poses:
 10 10 -10 0 0 0
 10 7.5 -13 0 0 0
