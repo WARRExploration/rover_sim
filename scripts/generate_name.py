@@ -59,7 +59,7 @@ def create_name(name, output_folder, pose=[0, 0, 0, 0, 0, 0]):
     create_gazebo_model(
         name=name, 
         output_folder=output_folder, 
-        template_mesh_vis='../resources/names/name_default.dae', 
+        template_mesh_vis=os.path.join(rover_sim_dir, 'resources','names','name_default.dae'), 
         template_texture=temp_texture_path,
         pose=pose,
         template_mesh_col=None,
@@ -77,8 +77,8 @@ def create_logo(name, output_folder, pose):
     create_gazebo_model(
         name=name, 
         output_folder=output_folder, 
-        template_mesh_vis='../resources/names/exp_logo.dae', 
-        template_texture='../resources/names/Exploration_logo.png',
+        template_mesh_vis=os.path.join(rover_sim_dir,'resources','names','exp_logo.dae'), 
+        template_texture=os.path.join(rover_sim_dir,'resources','names','Exploration_logo.png'),
         pose=pose,
         template_mesh_col=None,
         description="Name credit",
