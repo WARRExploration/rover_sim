@@ -1,7 +1,7 @@
 <launch>
     <arg name="model" default="$(find rover_config)/urdf/rover.xacro"/>
     <arg name="rvizconfig" default="$(find rover_config)/rviz/qr_detection.rviz" />
-    <arg name="world" default="Generated"/>
+    <arg name="world" default="erc2018final"/>
 
     <include file="$(find rover_sim)/launch/gazebo.launch">
         <arg name="model" value="$(arg model)" />

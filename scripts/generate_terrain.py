@@ -278,12 +278,12 @@ def generate_terrain(name, csv_file_path, output_folder):
     coords = get_coordinates_from_csv(csv_file_path)
 
     # TODO: generate texture (currently only copy of resources)
-    texture_path = os.path.join(rover_sim_dir, 'resources/terrain/sand_texture.png')
+    texture_path = os.path.join(rover_sim_dir, 'resources/terrain/texture.jpg')
     _, extension = os.path.splitext(texture_path)
     if not os.path.exists(texture_path):
         raise ValueError('The texture file is missing in the folder ' + texture_path)
 
-    relative_texture_path = 'texture' + extension
+    relative_texture_path = '../textures/texture' + extension
 
 
     temp_mesh = '/tmp/terrain_temp.dae'

@@ -7,6 +7,8 @@
     <include>
       <uri>model://sun</uri>
     </include>
+    <light type="directional" name="light1"/>
+    <light type="directional" name="light2"/>
     <include>
       <uri>model://terrain</uri>
     </include>
