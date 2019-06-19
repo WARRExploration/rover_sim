@@ -14,7 +14,7 @@ rover_sim_dir = rospack.get_path('rover_sim')
 sys.path.append(os.path.dirname(rover_sim_dir))
 
 def get_context_info_from_csv(csv_file_path):
-    """This function extracts the context information from a csv file based on the provided files
+    """This function extracts the context info from a csv file based on the provided files of the ERC
 
     Arguments:
         csv_file_path {str} -- path to the ERC csv file (ver2)
@@ -59,7 +59,8 @@ def get_heights_from_csv(csv_file_path):
     return heights
 
 def get_landmark_coords_from_csv(csv_file_path):
-    """This function extracts the landmarks' coordinates from a csv file based on the provided files of the ERC
+    """This function extracts the landmarks' coordinates from a csv file based on the provided 
+        files of the ERC
     
     Arguments:
         csv_file_path {str} -- path to the ERC csv file (Landmarks)
@@ -109,7 +110,7 @@ def interpolate_heights(context_info, heights, coords):
 
         # same for the y-coord
         ind_y = (int) ((coord_y - y_0) / spacing_y)
-        offset_y = (y_0 +coord_y) % spacing_y
+        offset_y = (y_0 + coord_y) % spacing_y
         offset_y /= spacing_y
 
         #interpolate
@@ -132,39 +133,37 @@ def save_fixed_landmarks(output, landmarks, landmark_heights):
     Arguments:
         output {str} -- path to output file (fixed landmarks)
         landmarks {str} -- path to input file (original landmarks)
-        coords {[[]]} -- array of landmarks' coordinates
-
-    Returns:
-        TODO
+        landmark_heights {[]} -- array of landmarks' interpolated heights
     """
 
+    # read original landmarks' information from file
     with open(landmarks, 'r') as readFile:
         reader = csv.reader(readFile)
         lines = list(reader)
 
     readFile.close()
 
+    # replace old heights by newly interpolated ones
     for i in range(len(lines)):
         if i == 0:
             continue
 
         lines[i][3] = landmark_heights[i-1]
 
+    # write the new landmark file
     with open(output, 'w') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerows(lines)
 
     writeFile.close()
 
-    return
-
 def fix_landmark_heights(heightmap, landmarks, output):
-    """generate the texture and the mesh of a ERC copyfileterrain in a specified folder
+    """snap the landmarks to the terrain according to the heights provided in the heightmap
 
     Arguments:
-        name {str} -- name of the generated terrain model
-        csv_file_path {str} -- path to the ERC csv file (ver2)
-        output_folder {str} -- path to the folder in which the model will be generated
+        heightmap {str} -- path to the ERC csv file (ver2)
+        landmarks {str} -- path to input file (original landmarks)
+        output {str} -- path to output file (fixed landmarks)
     """
 
     # read context info
