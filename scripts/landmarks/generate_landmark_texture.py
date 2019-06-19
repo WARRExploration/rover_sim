@@ -59,6 +59,7 @@ def generate_marker_image(number_of_marker, size):
 
     # generate the marker with the ar_track_alvar package (-u = resolution per unit) (-s = size in units) -> therefore the marker will have the pixel resoltion of size
     os.system('cd /tmp; rosrun ar_track_alvar createMarker -u ' + str(size) + ' -s 1 ' + str(number_of_marker))
+    print ("")
     marker = Image.open(temp_marker_path)
 
     # delete temporary file from /tmp folder

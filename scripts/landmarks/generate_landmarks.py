@@ -38,10 +38,20 @@ def all_landmarks_model(input_csv_path, landmark_models_path):
             landmark_name = row[0]
             i = row[0][1:]
 
-            # TODO: check if it there is already a model with this name
-            # create a single landmark model
+            print("# Creating Landmark " + landmark_name)
+
+            base_path = os.path.join(rover_sim_dir, landmark_models_path)
+            landmark_folder = os.path.join(base_path, landmark_name)
+
+            # check if landmark's folder already exists
+            if os.path.exists(landmark_folder):
+                print("The folder already exists: " + landmark_folder)
+                print("Skipping creation, leaving old landmark\n")
+
+            # create a single landmark model if necessary
             # (we define the pose in the <include>)
-            create_single_landmark(landmark_name, int(i), os.path.join(rover_sim_dir, landmark_models_path))
+            else:
+                create_single_landmark(landmark_name, int(i), base_path)
 
             model = etree.Element('model')
             model.set('name', landmark_name)
