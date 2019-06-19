@@ -74,7 +74,7 @@ def get_landmark_coords_from_csv(csv_file_path):
 
     return coords
 
-def interpolate_heights(context_info, heights, coords):
+def interpolate_heights(context_info, heights, coords, offset):
     """This function interpolates the correct heights at a coordinate based on the provided heightmap
     
     Arguments:
@@ -119,6 +119,9 @@ def interpolate_heights(context_info, heights, coords):
                     + (1-offset_x) * offset_y * heights[ind_x+1][ind_y]
                     + (1-offset_x) * (1-offset_y) * heights[ind_x+1][ind_y+1])
 
+        # add static offset
+        height += offset
+
         # adapt values to precision of the given *.csv files
         height = round(height, 2)
 
@@ -157,7 +160,7 @@ def save_fixed_landmarks(output, landmarks, landmark_heights):
 
     writeFile.close()
 
-def fix_landmark_heights(heightmap, landmarks, output):
+def fix_landmark_heights(heightmap, landmarks, output, offset):
     """snap the landmarks to the terrain according to the heights provided in the heightmap
 
     Arguments:
@@ -176,7 +179,7 @@ def fix_landmark_heights(heightmap, landmarks, output):
     coords = get_landmark_coords_from_csv(landmarks)
 
     # calculate the correct heights by interpolating
-    landmark_heights = interpolate_heights(context_info, heights, coords)
+    landmark_heights = interpolate_heights(context_info, heights, coords, offset)
 
     # save new heights to a proper *.csv file
     save_fixed_landmarks(output, landmarks, landmark_heights)
@@ -189,7 +192,8 @@ if __name__ == '__main__':
     # default values
     heightmap_csv_path = os.path.join(rover_sim_dir, 'worlds/erc2018final/Heightmap.csv')
     landmarks_csv_path = os.path.join(rover_sim_dir, 'worlds/erc2018final/Landmarks.csv')
-    fixed_landmarks_path = os.path.join(rover_sim_dir, 'worlds/erc2018final/Fixed_Landmarks.csv')
+    fixed_landmarks_path = os.path.join(rover_sim_dir, 'worlds/erc2018final/Landmarks.csv')
+    height_offset = 0
 
     # parse command line arguments
     parser = ArgumentParser(
@@ -199,7 +203,8 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--heightmap", type=str, help="path to an ERC csv file (ver2)", default=heightmap_csv_path)
     parser.add_argument("-l", "--landmarks", type=str, help="path to a heightmap csv file", default=landmarks_csv_path)
     parser.add_argument("-o", "--output", type=str, help="output path for fixed landmarks csv file", default=fixed_landmarks_path)
+    parser.add_argument("-s", "--offset", type=float, help="height offset added to all landmarks", default=height_offset)
     args = parser.parse_args()
 
     # fix landmark heigths
-    fix_landmark_heights(heightmap=args.heightmap, landmarks=args.landmarks, output=args.output)
+    fix_landmark_heights(heightmap=args.heightmap, landmarks=args.landmarks, output=args.output, offset=args.offset)
