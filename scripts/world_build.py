@@ -10,6 +10,7 @@ import os.path as op
 import os, sys
 from argparse import ArgumentParser
 import shutil
+import yaml
 
 from rospkg import RosPack
 
@@ -88,6 +89,15 @@ def world_build(world_path=None, force=False):
         print("Building world without landmarks\n")
         no_landmarks = True
 
+    try:
+        with open(os.path.join(base_path, "start.yaml"), 'r') as stream:
+            loaded = yaml.safe_load(stream)
+            cam_pos = (loaded.get('start_x'), loaded.get('start_y'), loaded.get('start_z'))
+            print(cam_pos)
+    except (yaml.YAMLError, IOError) as e:
+        print("Start position not found, default camera position: " + str(e))
+        cam_pos = None
+
 
     ## Generate the Models from the Resources
     
@@ -121,6 +131,15 @@ def world_build(world_path=None, force=False):
         world = etree.Element ('world')
         world.set("name", "default")
         root.append(world)
+
+        if cam_pos is not None:
+            gui = etree.Element("gui")
+            camera = etree.SubElement(gui,"camera")
+            camera.set("name", "user_camera")
+            camera_pose = etree.SubElement(camera, "pose")
+            xyz = "{:.2f} {:.2f} {:.2f} ".format(cam_pos[0] + 6, cam_pos[1] - 3, cam_pos[2] + 1)
+            camera_pose.text = xyz + "0 0.2 2.62"
+            world.append(gui)
 
         scene = etree.Element("scene")
         grid = etree.SubElement(scene,"grid")
