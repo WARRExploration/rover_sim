@@ -146,19 +146,22 @@ def create_model_sdf(name, model_file_path, output_file_path, pose=[0, 0, 0, 0, 
 
 
 def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture, 
-        pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_mesh_col=None, description=None, static=True, ghost=False):
+        pose=[0, 0, 0, 0, 0, 0], size=[1, 1, 1], template_mesh_col=None, model_folder=None,
+        description=None, static=True, ghost=False):
     """generates a whole gazebo model for a given mesh with texture
     
     Arguments:
         name {str} -- name of the model
-        output_file_path {str} -- path to the folder in which the model should be generated, the path will be created
-        template_mesh_vis {str} -- path to the template mesh (will be copied)
+        output_folder {str} -- path to the folder in which the model should be generated, the path will be created
+        template_mesh_vis {str} -- path to the template visual mesh (will be copied)
         template_texture {str} -- path to the texture (will be copied)
     
     Keyword Arguments:
         pose {list} -- position and rotation of the model (default: {[0, 0, 0, 0, 0, 0]})
         size {list} -- size of the model (default: {[1, 1, 1]})
         template_mesh_col {str} -- optional path to a template collision mesh (will be copied) (default: {None})
+        model_folder {str} -- path to the gazebo model folder (must be parent of output_folder) 
+                              (mesh references not relative to base package) (default: {None})
         description {str} -- optional description of the model (default: {None})
         static {bool} -- model does not move (default: {True})
         ghost {bool} -- model has no collision (default: {False})
@@ -213,14 +216,18 @@ def create_gazebo_model(name, output_folder, template_mesh_vis, template_texture
         description=description
     )
 
-    rospack = RosPack()
-    rover_sim_dir = rospack.get_path('rover_sim')
-    relative_path = os.path.relpath(base_path, rover_sim_dir)
-
-    mesh_vis_path = 'model://rover_sim/' + relative_path + '/meshes/mesh.dae'
+    # no model folder specified => use package relative addressing instead
+    if model_folder is None:
+        rospack = RosPack()
+        rover_sim_dir = rospack.get_path('rover_sim')
+        relative_path = os.path.join('rover_sim', os.path.relpath(base_path, rover_sim_dir))
+    else:
+        relative_path = os.path.relpath(base_path, model_folder)
+    
+    mesh_vis_path = 'model://' + relative_path + '/meshes/mesh.dae'
 
     if template_mesh_col:
-        mesh_col_path = 'model://rover_sim/' + relative_path + '/meshes/collision_mesh.dae'
+        mesh_col_path = 'model://' + relative_path + '/meshes/collision_mesh.dae'
     else:
         mesh_col_path = None
 
@@ -273,6 +280,7 @@ if __name__ == '__main__':
         pose=args.pose,
         size=args.size,
         template_mesh_col=args.collision,
+        model_folder=None,
         description=args.description,
         static=(not args.movable), 
         ghost=args.ghost

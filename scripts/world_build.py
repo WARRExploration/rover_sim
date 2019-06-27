@@ -90,9 +90,9 @@ def world_build(world_path=None, force=False):
 
 
     ## Generate the Models from the Resources
-
+    
     if not no_terrain:
-        generate_terrain(name=terran_name, csv_file_path=heightmap_csv, output_folder=custom_models)
+        generate_terrain(name=terran_name, csv_file_path=heightmap_csv, output_folder=custom_models, model_folder=custom_models)
     
     if not no_landmarks:                                                                                                         # ↓TODO
         create_landmarks(name=all_landmarks_name, input_csv_path=landmarks_csv, output_path=custom_models, landmark_models_path="/tmp/not_used_yet_TODO")

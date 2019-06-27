@@ -265,7 +265,7 @@ def generate_collada(coords, relative_texture_path):
     return mesh
 
 
-def generate_terrain(name, csv_file_path, output_folder):
+def generate_terrain(name, csv_file_path, output_folder, model_folder=None):
     """generate the texture and the mesh of a ERC terrain in a specified folder
 
     Arguments:
@@ -285,7 +285,6 @@ def generate_terrain(name, csv_file_path, output_folder):
 
     relative_texture_path = 'texture' + extension
 
-
     temp_mesh = '/tmp/terrain_temp.dae'
 
     # generate mesh
@@ -299,6 +298,7 @@ def generate_terrain(name, csv_file_path, output_folder):
         output_folder=output_folder, 
         template_mesh_vis=temp_mesh, 
         template_texture=texture_path,
+        model_folder=model_folder,
         description="Terrain heightmap"
     )
 
