@@ -7,7 +7,7 @@
     <arg name="headless" default="false"/>
     <arg name="debug" default="false"/>
     <arg name="model" default="$(find rover_config)/urdf/rover.xacro"/>
-    <arg name="world" default="Generated"/>
+    <arg name="world" default="erc2018final"/>
 
     <arg name="world_path" value="$(find rover_sim)/worlds/$(arg world)"/>
     <arg name="world_yaml_path" value="$(arg world_path)/start.yaml"/>
