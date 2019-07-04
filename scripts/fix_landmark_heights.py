@@ -50,8 +50,8 @@ def get_heights_from_csv(csv_file_path):
     # load heights from *.csv file
     heights = np.loadtxt(open(csv_file_path), delimiter=',', skiprows=2)
 
-    # flip the matrix around the x-axis to be able to index it the right way
-    heights = np.moveaxis(np.flip(heights, 0), 0, -1)
+    # transform the matrix so heights are accessible by intuitive indices
+    heights = np.swapaxes(np.flip(heights, 0), 0, 1)
 
     # apply threshold (set invalid values to 0)
     heights[heights >= 2.8] = 0
@@ -91,7 +91,7 @@ def interpolate_heights(context_info, heights, coords, offset):
     number_of_cols, number_of_rows = heights.shape
 
     # convert y_0 to actual coordinate at ind_y=0
-    y_0 -= number_of_rows*spacing_y
+    y_0 -= (number_of_rows-1)*spacing_y
 
     # init the new heights
     landmark_heights = []
@@ -167,6 +167,7 @@ def fix_landmark_heights(heightmap, landmarks, output, offset):
         heightmap {str} -- path to the ERC csv file (ver2)
         landmarks {str} -- path to input file (original landmarks)
         output {str} -- path to output file (fixed landmarks)
+        offset {float} -- height offset added to all landmarks
     """
 
     # read context info
