@@ -272,6 +272,7 @@ def generate_terrain(name, csv_file_path, output_folder, model_folder=None):
         name {str} -- name of the generated terrain model
         csv_file_path {str} -- path to the ERC csv file (ver2)
         output_folder {str} -- path to the folder in which the model will be generated
+        model_folder {str} -- path to the gazebo model folder (must be parent of output_folder) (default: {None})
     """
 
     # read coordinates
