@@ -151,6 +151,16 @@ def world_build(world_path=None, force=False):
         uri.text = "model://sun"
         world.append(include_sun)
 
+        light = etree.Element("light")
+        light.set("type", "directional")
+        light.set("name", "light1")
+        world.append(light)
+        
+        light = etree.Element("light")
+        light.set("type", "directional")
+        light.set("name", "light2")
+        world.append(light)
+
         include_terrain = etree.Element("include")
         uri = etree.SubElement(include_terrain,"uri")
         if no_terrain:

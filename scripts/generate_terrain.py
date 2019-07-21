@@ -57,14 +57,17 @@ def get_coordinates_from_csv(csv_file_path):
     # load heights from *.csv file
     data = np.loadtxt(open(csv_file_path), delimiter=',', skiprows=2)
 
-    # flip the matrix around the x-axis to be able to index it the right way
-    data = np.moveaxis(np.flip(data, 0), 0, -1)
+    # transform the matrix so heights are accessible by intuitive indices
+    data = np.swapaxes(np.flip(data, 0), 0, 1)
 
     # apply threshold (set invalid values to 0)
     data[data >= 2.8] = 0
 
     # get dimensions of the matrix
     number_of_cols, number_of_rows = data.shape
+
+    # convert y_0 to actual coordinate at ind_y=0
+    y_0 -= (number_of_rows-1)*spacing_y
 
     # x-Axis
     # generate vector
@@ -78,7 +81,7 @@ def get_coordinates_from_csv(csv_file_path):
     # generate vector
     ys = np.mgrid[:number_of_rows] * spacing_y
     # add possible offset
-    ys += y_0 - number_of_rows*spacing_y
+    ys += y_0
     # generate grid from vector
     ys = np.stack((ys,) * number_of_cols, axis=0)
 
@@ -279,12 +282,12 @@ def generate_terrain(name, csv_file_path, output_folder, model_folder=None):
     coords = get_coordinates_from_csv(csv_file_path)
 
     # TODO: generate texture (currently only copy of resources)
-    texture_path = os.path.join(rover_sim_dir, 'resources/terrain/sand_texture.png')
+    texture_path = os.path.join(rover_sim_dir, 'resources/terrain/texture.jpg')
     _, extension = os.path.splitext(texture_path)
     if not os.path.exists(texture_path):
         raise ValueError('The texture file is missing in the folder ' + texture_path)
 
-    relative_texture_path = 'texture' + extension
+    relative_texture_path = '../textures/texture' + extension
 
     temp_mesh = '/tmp/terrain_temp.dae'
 
